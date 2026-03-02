@@ -1,0 +1,48 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Next.js Build Output
+/.next/
+/out/
+
+# Production Build
+/build
+
+# Debugging logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Local Environment Variables
+# NEVER commit .env.local or any .env files containing secrets
+.env
+*.env
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel-specific
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Testing (Jest/Cypress)
+/coverage
+/cypress/screenshots
+/cypress/videos
+
+# System Files
+.DS_Store
+*.pem
+
+# IDE / Editors
+.vscode/
+.idea/
+*.swp
+*.swo

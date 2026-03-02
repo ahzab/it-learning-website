@@ -1,0 +1,210 @@
+/* app/globals.css */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Cairo:wght@300;400;500;600;700;900&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design tokens ─────────────────────────────────────────────────── */
+:root {
+  --gold:         #C9A84C;
+  --gold-light:   #E8C97A;
+  --gold-dim:     #8B6E2A;
+  --dark:         #060608;
+  --dark-2:       #0D0D12;
+  --dark-3:       #141419;
+  --dark-4:       #1C1C24;
+  --text-primary: #F0EBE0;
+  --text-muted:   #6B6672;
+  --text-subtle:  #3A3742;
+}
+
+/* ── Base reset ─────────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  /* Prevent iOS rubber-band bounce from causing layout shifts */
+  overscroll-behavior: none;
+}
+
+/* ── Mobile viewport fix (iOS Safari address bar) ───────────────────── */
+/* Use dvh where supported, fall back to 100vh */
+.h-dvh  { height: 100vh; height: 100dvh; }
+.min-h-dvh { min-height: 100vh; min-height: 100dvh; }
+
+/* ── iOS safe-area support ──────────────────────────────────────────── */
+/* Bottom nav must clear the home indicator on notched iPhones */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.mb-safe { margin-bottom:  env(safe-area-inset-bottom, 0px); }
+
+/* ── Touch targets — minimum 44×44pt per Apple HIG ─────────────────── */
+.touch-target {
+  min-height: 44px;
+  min-width:  44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Prevent double-tap zoom on interactive elements ───────────────── */
+button, a, input, textarea, select {
+  touch-action: manipulation;
+}
+
+/* ── Typography — Arabic (default, RTL) ─────────────────────────────── */
+body {
+  font-family: 'Cairo', sans-serif;
+  background-color: var(--dark);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  text-align: right;
+}
+
+/* ── Typography — Latin (LTR) ───────────────────────────────────────── */
+[dir="ltr"] body,
+html[dir="ltr"] body {
+  font-family: 'Inter', 'Cairo', sans-serif;
+  text-align: left;
+}
+
+/* Ensure inputs/textareas inherit direction and text alignment */
+input,
+textarea,
+select {
+  direction: inherit;
+  text-align: inherit;
+}
+
+/* Placeholder alignment matches input direction */
+[dir="rtl"] input::placeholder,
+[dir="rtl"] textarea::placeholder { text-align: right; }
+
+[dir="ltr"] input::placeholder,
+[dir="ltr"] textarea::placeholder { text-align: left; }
+
+/* Labels follow text direction */
+label { display: block; }
+
+/* ── Scrollbar ───────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+/* ── Font utilities ─────────────────────────────────────────────────── */
+.font-display   { font-family: 'Playfair Display', serif; }
+.font-mono-data { font-family: 'IBM Plex Mono', monospace; }
+.font-latin     { font-family: 'Inter', sans-serif; }
+
+/* ── Grain overlay ─────────────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.4;
+}
+
+/* ── Arabesque geometric SVG background ─────────────────────────────── */
+.arabesque-bg {
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23C9A84C' stroke-width='0.3' opacity='0.12'%3E%3Cpath d='M40 0 L80 40 L40 80 L0 40 Z'/%3E%3Cpath d='M40 10 L70 40 L40 70 L10 40 Z'/%3E%3Ccircle cx='40' cy='40' r='20'/%3E%3Ccircle cx='40' cy='40' r='10'/%3E%3Cpath d='M40 20 L60 40 L40 60 L20 40 Z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ── Animations ─────────────────────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
+}
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse-ring {
+  0%   { transform: scale(1);   opacity: 0.4; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes counter {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.animate-float          { animation: float     6s  ease-in-out infinite; }
+.animate-float-delayed  { animation: float     6s  ease-in-out 3s infinite; }
+.animate-spin-slow      { animation: spin-slow 40s linear infinite; }
+.animate-fade-up        { animation: fade-up   0.8s ease forwards; }
+.animate-marquee        { animation: marquee   25s linear infinite; }
+
+/* Staggered reveals */
+.reveal-1 { animation: fade-up 0.7s ease 0.1s  both; }
+.reveal-2 { animation: fade-up 0.7s ease 0.25s both; }
+.reveal-3 { animation: fade-up 0.7s ease 0.4s  both; }
+.reveal-4 { animation: fade-up 0.7s ease 0.55s both; }
+.reveal-5 { animation: fade-up 0.7s ease 0.7s  both; }
+
+/* ── Gold gradient text ─────────────────────────────────────────────── */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #E8C97A 0%, #C9A84C 40%, #A07830 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Shimmer button ─────────────────────────────────────────────────── */
+.btn-shimmer {
+  background: linear-gradient(90deg, #C9A84C 0%, #E8C97A 40%, #C9A84C 80%);
+  background-size: 200% 100%;
+  transition: background-position 0.4s;
+}
+.btn-shimmer:hover { background-position: right center; }
+
+/* ── Glass card ─────────────────────────────────────────────────────── */
+.glass {
+  background: rgba(255,255,255,0.025);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(201,168,76,0.1);
+}
+
+/* ── Print ──────────────────────────────────────────────────────────── */
+@media print {
+  body { background: white !important; }
+  .no-print { display: none !important; }
+}
+
+/* ── Tailwind utilities ─────────────────────────────────────────────── */
+@layer utilities {
+  .text-gold     { color: var(--gold); }
+  .text-gold-dim { color: var(--gold-dim); }
+  .bg-dark-2     { background-color: var(--dark-2); }
+  .bg-dark-3     { background-color: var(--dark-3); }
+  .bg-dark-4     { background-color: var(--dark-4); }
+  .border-gold   { border-color: var(--gold); }
+
+  /* Direction-aware logical spacing helpers */
+  .ps-4  { padding-inline-start: 1rem; }
+  .pe-4  { padding-inline-end:   1rem; }
+  .ms-auto { margin-inline-start: auto; }
+  .me-auto { margin-inline-end:   auto; }
+}
+
+/* ── Resizable builder panels (desktop only) ────────────────────────── */
+/* On mobile (< 768px) panels are full-width; on desktop use --panel-w  */
+@media (min-width: 768px) {
+  .resizable-panel {
+    width: var(--panel-w, 440px);
+  }
+}
