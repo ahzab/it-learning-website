@@ -13,7 +13,7 @@ export function Footer() {
     <footer className="relative overflow-hidden" style={{background:'#060608'}}>
       <div className="h-px" style={{background:'linear-gradient(90deg, transparent 0%, rgba(201,168,76,0.2) 30%, rgba(201,168,76,0.3) 50%, rgba(201,168,76,0.2) 70%, transparent 100%)'}} />
 
-      <div className="max-w-7xl mx-auto px-6 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
 
           {/* Brand */}

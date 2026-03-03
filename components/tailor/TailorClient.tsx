@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCVStore } from '@/lib/store'
+import { useT } from '@/lib/i18n/context'
 import { CVData } from '@/types/cv'
 
 type Stage = 'input' | 'tailoring' | 'review' | 'error'
@@ -141,7 +142,9 @@ export function TailorClient() {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const hasCV = !!(cv.personal.fullName || cv.personal.fullNameEn || cv.experience.length > 0)
-  const isAr = lang === 'ar'
+  const { t, isRTL, locale } = useT()
+  const b = t.builder
+  const isAr = isRTL // UI language from useT
 
   // Auto-resize textarea
   useEffect(() => {
@@ -197,16 +200,16 @@ export function TailorClient() {
       <div className="min-h-screen bg-[#080810] text-white flex flex-col items-center justify-center px-4">
         <div className="text-center max-w-md">
           <div className="text-5xl mb-4">📄</div>
-          <h2 className="text-2xl font-black mb-3">{isAr ? 'لا توجد سيرة ذاتية بعد' : 'No CV found'}</h2>
+          <h2 className="text-2xl font-black mb-3">{b.tailorNoCv}</h2>
           <p className="text-gray-400 mb-8">
-            {isAr ? 'يجب إنشاء سيرتك الذاتية أولاً قبل تخصيصها لوظيفة معينة' : 'You need to create your CV first before tailoring it for a specific job'}
+            {b.tailorNoCvDesc}
           </p>
           <div className="flex gap-3 justify-center">
             <a href="/generate" className="bg-yellow-500 text-black px-6 py-3 rounded-xl font-bold hover:bg-yellow-400 transition-all">
-              ✦ {isAr ? 'إنشاء بالذكاء الاصطناعي' : 'Generate with AI'}
+              {b.tailorGenerateAI}
             </a>
             <a href="/builder" className="border border-white/15 text-gray-300 px-6 py-3 rounded-xl font-semibold hover:border-white/30 transition-all">
-              {isAr ? 'إنشاء يدوي' : 'Manual create'}
+              {b.tailorManual}
             </a>
           </div>
         </div>
@@ -216,39 +219,37 @@ export function TailorClient() {
 
   // ── INPUT STAGE ───────────────────────────────────────────────────
   if (stage === 'input') return (
-    <div className="min-h-screen bg-[#080810] text-white" dir={isAr ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-[#080810] text-white" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header */}
-      <div className="px-6 py-4 flex items-center justify-between border-b border-white/6">
+      <div className="px-4 sm:px-6 py-3.5 flex items-center justify-between border-b border-white/6">
         <div className="flex items-center gap-3">
           <a href="/" className="text-yellow-500 font-black text-xl">سيرتي.ai</a>
           <div className="hidden sm:flex items-center gap-2 text-xs text-gray-500">
             <span>/</span>
-            <span>{isAr ? 'تخصيص لوظيفة' : 'Tailor for job'}</span>
+            <span>{b.tailorBreadcrumb}</span>
           </div>
         </div>
         <div className="flex gap-2">
           <button onClick={() => setLang('ar')} className={`text-xs px-3 py-1.5 rounded-lg border font-bold transition-all ${lang === 'ar' ? 'border-yellow-500/40 text-yellow-400 bg-yellow-500/10' : 'border-white/10 text-gray-500'}`}>🇸🇦</button>
           <button onClick={() => setLang('en')} className={`text-xs px-3 py-1.5 rounded-lg border font-bold transition-all ${lang === 'en' ? 'border-blue-500/40 text-blue-400 bg-blue-500/10' : 'border-white/10 text-gray-500'}`}>🇬🇧</button>
           <a href="/builder" className="text-xs px-3 py-1.5 rounded-lg border border-white/10 text-gray-400 hover:text-white transition-colors">
-            {isAr ? 'تعديل يدوي' : 'Manual edit'}
+            {b.tailorManualEdit}
           </a>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 py-10">
+      <div className="max-w-3xl mx-auto px-4 py-6 sm:py-10">
         {/* Hero */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-6 sm:mb-10">
           <div className="inline-flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/20 rounded-full px-4 py-1.5 text-xs text-yellow-400 font-semibold mb-5">
             <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse" />
-            {isAr ? 'مدعوم بالذكاء الاصطناعي' : 'AI-powered'}
+            {b.tailorAIPowered}
           </div>
-          <h1 className="text-3xl font-black mb-3">
-            {isAr ? 'خصّص سيرتك لكل وظيفة' : 'Tailor your CV for any job'}
+          <h1 className="text-2xl sm:text-3xl font-black mb-2 sm:mb-3">
+            {b.tailorHero}
           </h1>
           <p className="text-gray-400 text-base max-w-lg mx-auto leading-relaxed">
-            {isAr
-              ? 'الصق إعلان الوظيفة وسيعيد الذكاء الاصطناعي صياغة سيرتك لتتناسب تماماً مع المتطلبات — مع الحفاظ على كل بياناتك'
-              : 'Paste the job posting and AI will rewrite your CV to perfectly match the requirements — without changing your actual experience'}
+            {b.tailorSubtitle}
           </p>
         </div>
 
@@ -258,38 +259,38 @@ export function TailorClient() {
             {cv.personal.fullName?.[0] || cv.personal.fullNameEn?.[0] || '?'}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-bold truncate">{cv.personal.fullName || cv.personal.fullNameEn || (isAr ? 'سيرتي الذاتية' : 'My CV')}</div>
+            <div className="text-sm font-bold truncate">{cv.personal.fullName || cv.personal.fullNameEn || (b.tailorMyCv)}</div>
             <div className="text-xs text-gray-500 truncate">
-              {cv.personal.jobTitle || cv.personal.jobTitleEn || ''}{cv.experience.length > 0 ? ` · ${cv.experience.length} ${isAr ? 'خبرات' : 'experiences'}` : ''}
+              {cv.personal.jobTitle || cv.personal.jobTitleEn || ''}{cv.experience.length > 0 ? ` · ${cv.experience.length} ${b.tailorExperiences}` : ''}
             </div>
           </div>
           <div className="text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full flex-shrink-0">
-            ✓ {isAr ? 'محملة' : 'Loaded'}
+            {b.tailorLoaded}
           </div>
         </div>
 
         {/* Job info inputs */}
-        <div className="grid grid-cols-2 gap-3 mb-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
           <div>
             <label className="block text-xs text-gray-500 font-semibold uppercase tracking-widest mb-1.5">
-              {isAr ? 'المسمى الوظيفي' : 'Job Title'}
+              {b.jobTitleOptional}
             </label>
             <input
               value={jobTitle}
               onChange={e => setJobTitle(e.target.value)}
-              placeholder={isAr ? 'Senior React Developer' : 'Senior React Developer'}
+              placeholder="Senior React Developer"
               dir="ltr"
               className="w-full bg-[#111118] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:border-yellow-500/50 focus:outline-none transition-colors"
             />
           </div>
           <div>
             <label className="block text-xs text-gray-500 font-semibold uppercase tracking-widest mb-1.5">
-              {isAr ? 'اسم الشركة' : 'Company'}
+              {b.companyOptional}
             </label>
             <input
               value={company}
               onChange={e => setCompany(e.target.value)}
-              placeholder={isAr ? 'Careem, OCP, Emirates NBD...' : 'Careem, OCP, Emirates NBD...'}
+              placeholder="Careem, OCP, Emirates NBD..."
               dir="ltr"
               className="w-full bg-[#111118] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:border-yellow-500/50 focus:outline-none transition-colors"
             />
@@ -299,24 +300,22 @@ export function TailorClient() {
         {/* Job description textarea */}
         <div className="mb-4">
           <label className="block text-xs text-gray-500 font-semibold uppercase tracking-widest mb-1.5">
-            {isAr ? 'الوصف الوظيفي / Job Description' : 'Job Description'}
-            <span className="text-gray-700 font-normal mr-2">{isAr ? '(الصق الإعلان كاملاً)' : '(paste the full posting)'}</span>
+            {b.tailorJobDescLabel}
+            <span className="text-gray-700 font-normal mr-2">{b.tailorJobDescHint}</span>
           </label>
           <textarea
             ref={textareaRef}
             value={jobDesc}
             onChange={e => setJobDesc(e.target.value)}
-            placeholder={isAr
-              ? 'الصق هنا وصف الوظيفة بالكامل — كلما كان أطول كانت النتائج أفضل...'
-              : 'Paste the full job description here — the more detail the better...'}
-            className="w-full bg-[#111118] border border-white/10 rounded-2xl px-5 py-4 text-sm text-white placeholder-gray-600 focus:border-yellow-500/50 focus:outline-none resize-none transition-colors leading-relaxed"
+            placeholder={b.tailorPlaceholder}
+            className="w-full bg-[#111118] border border-white/10 rounded-2xl px-4 py-3 sm:px-5 sm:py-4 text-sm text-white placeholder-gray-600 focus:border-yellow-500/50 focus:outline-none resize-none transition-colors leading-relaxed"
             style={{ minHeight: 180 }}
           />
         </div>
 
         {/* Example job postings */}
         <div className="mb-6">
-          <p className="text-xs text-gray-600 uppercase tracking-widest mb-2">{isAr ? 'أمثلة وظائف' : 'Example jobs'}</p>
+          <p className="text-xs text-gray-600 uppercase tracking-widest mb-2">{b.tailorExamples}</p>
           <div className="flex flex-wrap gap-2">
             {JOB_EXAMPLES.map((ex, i) => (
               <button
@@ -334,25 +333,25 @@ export function TailorClient() {
         {/* What AI does */}
         <div className="bg-[#111118] border border-white/6 rounded-2xl p-5 mb-6">
           <p className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-4">
-            {isAr ? 'ماذا سيفعل الذكاء الاصطناعي؟' : 'What will AI do?'}
+            {b.tailorWhatAI}
           </p>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { icon: '📝', ar: 'يعيد صياغة النبذة الشخصية لتتناسب مع الوظيفة', en: 'Rewrites your summary to match the role' },
-              { icon: '💼', ar: 'يبرز الخبرات الأكثر صلة بالوظيفة', en: 'Highlights your most relevant experience' },
-              { icon: '🔑', ar: 'يضيف كلمات مفتاحية من الإعلان لنظام ATS', en: 'Adds ATS keywords from the job posting' },
-              { icon: '⚡', ar: 'يرتب المهارات حسب أهميتها للوظيفة', en: 'Reorders skills by job relevance' },
+              { icon: '📝', ar: 'يعيد صياغة النبذة الشخصية لتتناسب مع الوظيفة', en: 'Rewrites your summary to match the role', fr: 'Réécrit votre résumé pour correspondre au poste' },
+              { icon: '💼', ar: 'يبرز الخبرات الأكثر صلة بالوظيفة', en: 'Highlights your most relevant experience', fr: 'Met en avant votre expérience la plus pertinente' },
+              { icon: '🔑', ar: 'يضيف كلمات مفتاحية من الإعلان لنظام ATS', en: 'Adds ATS keywords from the job posting', fr: "Ajoute des mots-clés ATS de l'offre d'emploi" },
+              { icon: '⚡', ar: 'يرتب المهارات حسب أهميتها للوظيفة', en: 'Reorders skills by job relevance', fr: 'Réorganise les compétences par pertinence' },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-2.5">
                 <span className="text-lg flex-shrink-0">{item.icon}</span>
-                <span className="text-xs text-gray-400 leading-relaxed">{isAr ? item.ar : item.en}</span>
+                <span className="text-xs text-gray-400 leading-relaxed">{locale === 'ar' ? item.ar : locale === 'fr' ? item.fr : item.en}</span>
               </div>
             ))}
           </div>
           <div className="mt-4 pt-4 border-t border-white/6 flex items-center gap-2">
             <span className="text-emerald-400 text-sm">✓</span>
             <span className="text-xs text-gray-500">
-              {isAr ? 'لا يُضاف أي شيء غير موجود في سيرتك — فقط إعادة الصياغة والترتيب' : 'Nothing invented — only rewriting and reordering what you already have'}
+              {b.tailorNoInvention}
             </span>
           </div>
         </div>
@@ -364,7 +363,7 @@ export function TailorClient() {
           className="w-full py-4 rounded-2xl bg-gradient-to-r from-yellow-500 to-yellow-400 text-black font-black text-lg hover:from-yellow-400 hover:to-yellow-300 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-3"
         >
           <span>✦</span>
-          {isAr ? 'خصّص سيرتي لهذه الوظيفة' : 'Tailor my CV for this job'}
+          {b.tailorSubmit}
         </button>
       </div>
     </div>
@@ -384,7 +383,7 @@ export function TailorClient() {
           <div className="absolute -inset-2 rounded-3xl border border-yellow-500/10 animate-pulse" />
         </div>
 
-        <h2 className="text-2xl font-black mb-2">{isAr ? 'جاري التخصيص…' : 'Tailoring…'}</h2>
+        <h2 className="text-2xl font-black mb-2">{b.tailorInProgress}</h2>
         {(jobTitle || company) && (
           <p className="text-gray-500 text-sm mb-1">
             {jobTitle && <span className="text-yellow-400">{jobTitle}</span>}
@@ -402,7 +401,7 @@ export function TailorClient() {
           ))}
         </div>
 
-        <p className="text-xs text-gray-700">{isAr ? 'يستغرق 15-25 ثانية' : 'Takes 15-25 seconds'}</p>
+        <p className="text-xs text-gray-700">{b.tailorTakes}</p>
       </div>
     </div>
   )
@@ -412,10 +411,10 @@ export function TailorClient() {
     <div className="min-h-screen bg-[#080810] text-white flex flex-col items-center justify-center px-4">
       <div className="text-center max-w-sm">
         <div className="text-5xl mb-4">⚠️</div>
-        <h2 className="text-xl font-bold mb-2">{isAr ? 'حدث خطأ' : 'Something went wrong'}</h2>
+        <h2 className="text-xl font-bold mb-2">{b.tailorError}</h2>
         <p className="text-gray-400 text-sm mb-6">{error}</p>
         <button onClick={() => setStage('input')} className="bg-yellow-500 text-black px-6 py-3 rounded-xl font-bold hover:bg-yellow-400 transition-all">
-          {isAr ? 'حاول مرة أخرى' : 'Try again'}
+          {b.tailorRetry}
         </button>
       </div>
     </div>
@@ -427,14 +426,14 @@ export function TailorClient() {
     const matchColor = result.matchScore >= 80 ? '#10B981' : result.matchScore >= 60 ? '#C9A84C' : '#EF4444'
 
     return (
-      <div className="min-h-screen bg-[#080810] text-white" dir={isAr ? 'rtl' : 'ltr'}>
+      <div className="min-h-screen bg-[#080810] text-white" dir={isRTL ? 'rtl' : 'ltr'}>
         {/* Sticky header */}
         <div className="sticky top-0 z-40 bg-[#080810]/95 backdrop-blur border-b border-white/8 px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <a href="/" className="text-yellow-500 font-black text-lg flex-shrink-0">سيرتي.ai</a>
             <div className="hidden sm:flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-1 flex-shrink-0">
               <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-              <span className="text-xs text-emerald-400 font-semibold">{isAr ? 'تم التخصيص!' : 'Tailored!'}</span>
+              <span className="text-xs text-emerald-400 font-semibold">{b.tailorDone}</span>
             </div>
             {(jobTitle || company) && (
               <span className="hidden md:block text-xs text-gray-500 truncate">
@@ -445,13 +444,13 @@ export function TailorClient() {
           </div>
           <div className="flex items-center gap-2">
             <button onClick={() => setStage('input')} className="text-xs text-gray-400 hover:text-white border border-white/10 px-3 py-1.5 rounded-lg transition-colors">
-              {isAr ? '← وظيفة أخرى' : '← Different job'}
+              {b.tailorDifferentJob}
             </button>
             <button
               onClick={applyAndEdit}
               className="bg-yellow-500 hover:bg-yellow-400 text-black font-black text-sm px-5 py-2 rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-yellow-500/20"
             >
-              ✎ {isAr ? 'تعديل وحفظ' : 'Edit & Save'}
+              ✎ {b.tailorEditSave}
             </button>
           </div>
         </div>
@@ -464,17 +463,17 @@ export function TailorClient() {
             <div className="bg-[#111118] rounded-2xl border border-white/8 p-6 flex items-center gap-5">
               <ScoreRing score={result.matchScore} />
               <div>
-                <h3 className="text-lg font-black mb-1">{isAr ? 'نسبة التطابق' : 'Match Score'}</h3>
+                <h3 className="text-lg font-black mb-1">{b.tailorMatchScore}</h3>
                 <p className="text-sm text-gray-400 leading-relaxed">
                   {result.matchScore >= 80
-                    ? (isAr ? 'سيرتك متوافقة بشكل ممتاز مع هذه الوظيفة' : 'Excellent match for this role')
+                    ? (b.tailorExcellent)
                     : result.matchScore >= 60
-                    ? (isAr ? 'تطابق جيد — يمكن التحسين أكثر' : 'Good match — could be improved')
-                    : (isAr ? 'تطابق جزئي — قد تحتاج مهارات إضافية' : 'Partial match — may need more skills')}
+                    ? (b.tailorGood)
+                    : (b.tailorPartial)}
                 </p>
                 {result.missingSkills.length > 0 && (
                   <div className="mt-2">
-                    <span className="text-xs text-gray-600">{isAr ? 'مهارات مطلوبة غير موجودة: ' : 'Missing skills: '}</span>
+                    <span className="text-xs text-gray-600">{b.tailorMissingSkills}</span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {result.missingSkills.slice(0, 4).map((s, i) => (
                         <span key={i} className="text-xs bg-red-500/10 border border-red-500/20 text-red-400 px-2 py-0.5 rounded-lg">{s}</span>
@@ -488,7 +487,7 @@ export function TailorClient() {
             {/* Keywords added */}
             <div className="bg-[#111118] rounded-2xl border border-white/8 p-6">
               <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">
-                {isAr ? 'الكلمات المفتاحية المضافة' : 'Keywords Added'}
+                {b.tailorKeywordsAdded}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {result.jobKeywords.map((kw, i) => (
@@ -498,7 +497,7 @@ export function TailorClient() {
                 ))}
               </div>
               <p className="text-xs text-gray-600 mt-3">
-                {isAr ? 'هذه الكلمات تساعد نظام ATS في التعرف على سيرتك' : 'These keywords help ATS systems recognize your CV'}
+                {b.tailorKeywordsHelp}
               </p>
             </div>
           </div>
@@ -508,10 +507,10 @@ export function TailorClient() {
             <div className="h-1 bg-gradient-to-r from-yellow-500 to-emerald-500" />
             <div className="p-6">
               <div className="flex items-center justify-between mb-5">
-                <h3 className="text-lg font-black">{isAr ? 'السيرة المخصصة' : 'Tailored CV'}</h3>
+                <h3 className="text-lg font-black">{b.tailorTailoredCv}</h3>
                 {(jobTitle || company) && (
                   <div className="text-xs bg-white/5 border border-white/10 rounded-lg px-3 py-1 text-gray-400">
-                    {isAr ? 'مخصص لـ' : 'Tailored for'}: <span className="text-yellow-400">{jobTitle || ''}</span>{company ? ` @ ${company}` : ''}
+                    {b.tailorTailoredFor}: <span className="text-yellow-400">{jobTitle || ''}</span>{company ? ` @ ${company}` : ''}
                   </div>
                 )}
               </div>
@@ -536,7 +535,7 @@ export function TailorClient() {
                 <div className="bg-emerald-500/5 border border-emerald-500/15 rounded-xl p-4 mb-4">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="w-2 h-2 bg-emerald-400 rounded-full" />
-                    <span className="text-xs text-emerald-400 font-bold uppercase tracking-widest">{isAr ? 'النبذة المحسّنة' : 'Enhanced Summary'}</span>
+                    <span className="text-xs text-emerald-400 font-bold uppercase tracking-widest">{b.tailorEnhancedSummary}</span>
                   </div>
                   {tailoredP.summary && <p className="text-sm text-gray-300 leading-relaxed mb-2" dir="rtl">{tailoredP.summary}</p>}
                   {tailoredP.summaryEn && tailoredP.summaryEn !== tailoredP.summary && (
@@ -548,7 +547,7 @@ export function TailorClient() {
               {/* Experience */}
               {result.cv.experience.length > 0 && (
                 <div className="mb-4">
-                  <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-3">{isAr ? 'الخبرات' : 'Experience'}</div>
+                  <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-3">{b.tailorExperienceLabel}</div>
                   <div className="space-y-3">
                     {result.cv.experience.slice(0, 3).map((exp, i) => (
                       <div key={i} className="flex items-start gap-3 p-3 bg-white/3 rounded-xl">
@@ -571,7 +570,7 @@ export function TailorClient() {
               {/* Skills */}
               {result.cv.skills.length > 0 && (
                 <div>
-                  <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-2">{isAr ? 'المهارات (مرتبة حسب الصلة)' : 'Skills (sorted by relevance)'}</div>
+                  <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-2">{b.tailorSkillsSorted}</div>
                   <div className="flex flex-wrap gap-1.5">
                     {result.cv.skills.slice(0, 10).map((s, i) => (
                       <span key={i} className={`text-xs px-2.5 py-1 rounded-lg border font-semibold transition-all ${
@@ -595,7 +594,7 @@ export function TailorClient() {
               className="flex items-center gap-2 mb-4 text-sm font-bold text-gray-400 hover:text-white transition-colors"
             >
               <span className="transition-transform" style={{ transform: showDiffs ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
-              {isAr ? `التغييرات التي تم إجراؤها (${result.changes.length})` : `Changes made (${result.changes.length})`}
+              {`${b.tailorChangesCount} (${result.changes.length})`}
             </button>
             {showDiffs && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -612,13 +611,13 @@ export function TailorClient() {
               onClick={applyAndEdit}
               className="flex-1 py-4 rounded-2xl bg-gradient-to-r from-yellow-500 to-yellow-400 text-black font-black text-lg hover:from-yellow-400 hover:to-yellow-300 transition-all shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2"
             >
-              ✎ {isAr ? 'تعديل وتخصيص + حفظ' : 'Edit, customize & save'}
+              {b.tailorEditCustomize}
             </button>
             <button
               onClick={() => setStage('input')}
               className="sm:w-auto py-4 px-6 rounded-2xl border border-white/10 text-gray-400 hover:text-white hover:border-white/20 transition-all font-semibold"
             >
-              {isAr ? 'وظيفة أخرى' : 'Different job'}
+              {b.tailorDifferentJob2}
             </button>
           </div>
         </div>

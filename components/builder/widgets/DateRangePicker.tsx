@@ -1,9 +1,11 @@
 'use client'
 // components/builder/widgets/DateRangePicker.tsx
 import { useState, useRef, useEffect } from 'react'
+import { useT } from '@/lib/i18n/context'
 
 const MONTHS_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر']
 const MONTHS_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+const MONTHS_FR = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc']
 const NOW = new Date()
 const YEARS = Array.from({length:35},(_,i)=>NOW.getFullYear()-i)
 
@@ -25,12 +27,12 @@ function buildDateStr(m: number, y: number, months: string[]) {
   return ''
 }
 
-function DateDropdown({ label, value, onChange, isEn, disabled }: {
-  label: string; value: string; onChange: (v: string) => void; isEn: boolean; disabled?: boolean
+function DateDropdown({ label, value, onChange, months, presentText, selectText, disabled }: {
+  label: string; value: string; onChange: (v: string) => void
+  months: string[]; presentText: string; selectText: string; disabled?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
-  const months = isEn ? MONTHS_EN : MONTHS_AR
   const { month, year } = parseDateStr(value, months)
 
   useEffect(() => {
@@ -47,7 +49,7 @@ function DateDropdown({ label, value, onChange, isEn, disabled }: {
     setOpen(false)
   }
 
-  const display = value && !disabled ? value : disabled ? (isEn ? 'Present' : 'حتى الآن') : (isEn ? 'Select…' : 'اختر…')
+  const display = value && !disabled ? value : disabled ? presentText : selectText
 
   return (
     <div className="flex-1" ref={ref}>
@@ -69,7 +71,6 @@ function DateDropdown({ label, value, onChange, isEn, disabled }: {
 
       {open && (
         <div className="absolute z-[100] mt-1 bg-[#1A1A28] border border-white/12 rounded-2xl shadow-2xl shadow-black/50 p-3 w-52 end-0 sm:end-auto sm:start-0" dir="ltr">
-          {/* Month grid */}
           <div className="grid grid-cols-4 gap-1 mb-2.5">
             {months.map((m, i) => (
               <button key={m} onClick={() => setMonth(i)} className={[
@@ -79,7 +80,6 @@ function DateDropdown({ label, value, onChange, isEn, disabled }: {
               ].join(' ')}>{m}</button>
             ))}
           </div>
-          {/* Year list */}
           <div className="border-t border-white/8 pt-2 max-h-40 overflow-y-auto space-y-0.5">
             {YEARS.map(y => (
               <button key={y} onClick={() => setYear(y)} className={[
@@ -97,21 +97,26 @@ function DateDropdown({ label, value, onChange, isEn, disabled }: {
 interface Props {
   startDate: string; endDate: string; isCurrent: boolean
   onStartChange:(v:string)=>void; onEndChange:(v:string)=>void; onCurrentChange:(v:boolean)=>void
-  isEn: boolean
 }
 
-export function DateRangePicker({ startDate, endDate, isCurrent, onStartChange, onEndChange, onCurrentChange, isEn }: Props) {
+export function DateRangePicker({ startDate, endDate, isCurrent, onStartChange, onEndChange, onCurrentChange }: Props) {
+  const { t, locale } = useT()
+  const b = t.builder
+  const months = locale === 'ar' ? MONTHS_AR : locale === 'fr' ? MONTHS_FR : MONTHS_EN
+
   return (
     <div className="space-y-2.5">
       <div className="flex gap-3 relative">
-        <DateDropdown label={isEn?'From':'من'} value={startDate} onChange={onStartChange} isEn={isEn} />
-        <DateDropdown label={isEn?'To':'إلى'} value={endDate} onChange={onEndChange} isEn={isEn} disabled={isCurrent} />
+        <DateDropdown label={b.dateFrom} value={startDate} onChange={onStartChange}
+          months={months} presentText={b.datePresent} selectText={b.dateSelect} />
+        <DateDropdown label={b.dateTo} value={endDate} onChange={onEndChange}
+          months={months} presentText={b.datePresent} selectText={b.dateSelect} disabled={isCurrent} />
       </div>
       <label className="flex items-center gap-2.5 cursor-pointer select-none group w-fit">
         <div onClick={() => onCurrentChange(!isCurrent)} className={`w-9 h-5 rounded-full transition-all duration-200 flex items-center px-0.5 ${isCurrent?'bg-yellow-500':'bg-white/10'}`}>
           <div className={`w-4 h-4 rounded-full bg-white shadow-md transition-all duration-200 ${isCurrent?'translate-x-4':'translate-x-0'}`} />
         </div>
-        <span className="text-xs text-gray-500 group-hover:text-gray-300 transition-colors">{isEn?'Currently working here':'لا زلت أعمل هنا'}</span>
+        <span className="text-xs text-gray-500 group-hover:text-gray-300 transition-colors">{b.currentlyWorking}</span>
       </label>
     </div>
   )

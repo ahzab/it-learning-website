@@ -47,49 +47,49 @@ export function HeroSection() {
       <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full pointer-events-none"
         style={{ background:'radial-gradient(circle, rgba(56,82,190,0.06) 0%, transparent 70%)', transform:'translate(-30%, 30%)' }} />
 
-      <div className="relative max-w-7xl mx-auto w-full px-6 py-20 grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-8 items-center">
+      <div className="relative max-w-7xl mx-auto w-full px-4 sm:px-6 py-12 sm:py-16 lg:py-20 grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-8 items-center">
 
         {/* Text column — in RTL: order-2/lg:order-1 (text appears on right side of grid which is visual left in RTL) */}
         {/* In LTR: order-1 (text on left) */}
         <div className={`lg:col-span-3 ${isRTL ? 'order-2 lg:order-1' : 'order-1 lg:order-1'}`}>
-          <div className="reveal-1 inline-flex items-center gap-2.5 px-4 py-2 rounded-full text-xs font-bold mb-8 border"
+          <div className="reveal-1 inline-flex items-center gap-2.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs font-bold mb-5 sm:mb-8 border"
             style={{ background:'rgba(201,168,76,0.06)', borderColor:'rgba(201,168,76,0.2)', color:'#C9A84C' }}>
             <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C] animate-pulse" />
             {h.badge}
           </div>
 
           <div className="reveal-2">
-            <h1 className="font-black leading-[1.05] mb-6">
-              <span className="block text-5xl lg:text-6xl xl:text-7xl text-[#F0EBE0] tracking-tight">{h.headline1}</span>
-              <span className="block text-5xl lg:text-6xl xl:text-7xl tracking-tight" style={goldText}>{h.headline2}</span>
-              <span className="block text-3xl lg:text-4xl text-[#3A3742] font-bold mt-2 tracking-tight">{h.headline3}</span>
+            <h1 className="font-black leading-[1.05] mb-4 sm:mb-6">
+              <span className="block text-4xl sm:text-5xl lg:text-6xl xl:text-7xl text-[#F0EBE0] tracking-tight">{h.headline1}</span>
+              <span className="block text-4xl sm:text-5xl lg:text-6xl xl:text-7xl tracking-tight" style={goldText}>{h.headline2}</span>
+              <span className="block text-2xl sm:text-3xl lg:text-4xl text-[#3A3742] font-bold mt-2 tracking-tight">{h.headline3}</span>
             </h1>
           </div>
 
-          <p className="reveal-3 text-base lg:text-lg text-[#6B6672] leading-relaxed mb-10 max-w-xl">{h.subtext}</p>
+          <p className="reveal-3 text-sm sm:text-base lg:text-lg text-[#6B6672] leading-relaxed mb-7 sm:mb-10 max-w-xl">{h.subtext}</p>
 
-          <div className="reveal-4 flex flex-col sm:flex-row gap-3 mb-12">
+          <div className="reveal-4 flex flex-col sm:flex-row gap-3 mb-8 sm:mb-12">
             <Link href="/generate"
-              className="group flex items-center justify-center gap-3 px-7 py-4 rounded-xl font-black text-base text-black transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_50px_rgba(201,168,76,0.5)]"
+              className="group flex items-center justify-center gap-3 px-6 py-3.5 sm:px-7 sm:py-4 rounded-xl font-black text-base text-black transition-all duration-300 active:scale-95 sm:hover:-translate-y-1 hover:shadow-[0_0_50px_rgba(201,168,76,0.5)]"
               style={{ background:'linear-gradient(135deg,#E8C97A 0%,#C9A84C 60%,#A07830 100%)', boxShadow:'0 0 30px rgba(201,168,76,0.3)' }}>
               <span className="animate-pulse">✦</span>
               {h.ctaAI}
             </Link>
             <Link href="/builder"
-              className="flex items-center justify-center gap-2 px-7 py-4 rounded-xl font-bold text-base border transition-all duration-300 hover:-translate-y-1 hover:border-white/25"
+              className="flex items-center justify-center gap-2 px-6 py-3.5 sm:px-7 sm:py-4 rounded-xl font-bold text-base border transition-all duration-300 active:scale-95 sm:hover:-translate-y-1 hover:border-white/25"
               style={{ borderColor:'rgba(255,255,255,0.1)', color:'#9994A0', background:'rgba(255,255,255,0.02)' }}>
               {h.ctaManual}
             </Link>
           </div>
 
-          <div className="reveal-5 flex items-center gap-8">
+          <div className="reveal-5 flex items-center gap-5 sm:gap-8">
             {[
               { num: h.stat1Num, label: h.stat1Label },
               { num: h.stat2Num, label: h.stat2Label },
               { num: h.stat3Num, label: h.stat3Label },
             ].map(s => (
               <div key={s.label}>
-                <div className="text-2xl font-black font-mono-data" style={goldText}>{s.num}</div>
+                <div className="text-xl sm:text-2xl font-black font-mono-data" style={goldText}>{s.num}</div>
                 <div className="text-xs text-[#3A3742] font-semibold mt-0.5">{s.label}</div>
               </div>
             ))}

@@ -174,7 +174,7 @@ export const tailorSchema = z.object({
 // ── Payment ───────────────────────────────────────────────────────────────────
 
 export const checkoutSchema = z.object({
-  plan: z.enum(['BASIC', 'PRO'], { message: 'validation.payment.plan' }),
+  plan: z.enum(['STARTER', 'PRO'], { message: 'validation.payment.plan' }),
 })
 
 // ── Type exports ──────────────────────────────────────────────────────────────

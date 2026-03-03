@@ -120,7 +120,7 @@ export default function LoginPage() {
             </div>
 
             <button type="submit" disabled={loading}
-              className="w-full py-3 rounded-xl text-sm font-black text-black transition-all hover:-translate-y-0.5 disabled:opacity-50"
+              className="w-full py-3 rounded-xl text-sm font-black text-black transition-all active:scale-98 sm:hover:-translate-y-0.5 disabled:opacity-50"
               style={{ background:'linear-gradient(135deg,#E8C97A,#C9A84C)', boxShadow:'0 0 25px rgba(201,168,76,0.25)' }}>
               {loading ? a.loginLoading : a.loginCta}
             </button>

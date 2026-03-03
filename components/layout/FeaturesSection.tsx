@@ -16,13 +16,13 @@ export function FeaturesSection() {
   const f = t.features
 
   return (
-    <section id="features" className="py-28 px-6 relative overflow-hidden" style={{background:'#0A0A10'}}>
+    <section id="features" className="py-16 sm:py-24 px-4 sm:px-6 relative overflow-hidden" style={{background:'#0A0A10'}}>
       <div className="absolute inset-0 arabesque-bg opacity-30 pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 sm:mb-16">
           <div className="text-[10px] font-bold uppercase tracking-[0.25em] mb-5" style={{color:'#C9A84C'}}>{f.sectionLabel}</div>
-          <h2 className="text-4xl lg:text-5xl font-black text-[#F0EBE0] leading-tight mb-4">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#F0EBE0] leading-tight mb-4">
             {f.headline1}{' '}
             <span style={{background:'linear-gradient(135deg,#E8C97A,#C9A84C)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text'}}>
               {f.headline2}
@@ -31,12 +31,12 @@ export function FeaturesSection() {
           <p className="text-[#6B6672] text-base max-w-xl mx-auto leading-relaxed">{f.subtext}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {f.list.map((feature, i) => {
             const col = COLORS[i]
             return (
               <div key={i}
-                className="group relative rounded-2xl p-6 border transition-all duration-300 hover:-translate-y-1 cursor-default overflow-hidden"
+                className="group relative rounded-2xl p-5 sm:p-6 border transition-all duration-300 hover:-translate-y-1 cursor-default overflow-hidden"
                 style={{background:`linear-gradient(135deg, ${col.bg} 0%, rgba(255,255,255,0.012) 100%)`, borderColor: col.border}}>
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl"
                   style={{background:`radial-gradient(circle at 50% 0%, ${col.bg} 0%, transparent 70%)`}} />

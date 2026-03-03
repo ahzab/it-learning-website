@@ -3,11 +3,14 @@
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { useT } from '@/lib/i18n/context'
 
 export function DownloadButton() {
   const { data: session } = useSession()
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const { t } = useT()
+  const b = t.builder
 
   const handleDownload = async () => {
     if (!session) {
@@ -15,7 +18,6 @@ export function DownloadButton() {
       return
     }
 
-    // Check plan
     const userPlan = (session.user as any).plan
     if (userPlan === 'FREE') {
       router.push('/pricing')
@@ -24,14 +26,13 @@ export function DownloadButton() {
 
     setLoading(true)
     try {
-      // Dynamically import html2pdf to avoid SSR issues
       const html2pdf = (await import('html2pdf.js')).default
       const element = document.getElementById('cv-to-print')
       if (!element) return
 
       const opt = {
         margin: 0,
-        filename: 'سيرتي-الذاتية.pdf',
+        filename: 'my-cv.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
@@ -45,6 +46,8 @@ export function DownloadButton() {
     }
   }
 
+  const isPaid = session && (session.user as any)?.plan !== 'FREE'
+
   return (
     <button
       onClick={handleDownload}
@@ -57,7 +60,7 @@ export function DownloadButton() {
         <span className="text-base leading-none">⬇</span>
       )}
       <span className="hidden sm:inline">
-        {session && (session.user as any)?.plan !== 'FREE' ? 'تحميل PDF' : 'تحميل — $7'}
+        {isPaid ? b.downloadPdf : b.downloadPay}
       </span>
     </button>
   )

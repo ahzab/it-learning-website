@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCVStore } from '@/lib/store'
+import { useT } from '@/lib/i18n/context'
 import { CVData } from '@/types/cv'
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -97,6 +98,8 @@ function FieldGroup({ label, arValue, enValue, onChange }: {
 export function GenerateClient() {
   const router = useRouter()
   const loadCV = useCVStore(s => s.loadCV)
+  const { t, isRTL, locale } = useT()
+  const b = t.builder
 
   const [stage, setStage] = useState<Stage>('input')
   const [description, setDescription] = useState('')
@@ -178,13 +181,14 @@ export function GenerateClient() {
     router.push('/builder')
   }
 
-  const isAr = lang === 'ar'
+  const isAr = isRTL // UI language from useT
+  const uiDir = isRTL ? 'rtl' : 'ltr'
 
   // ── STAGE: INPUT ─────────────────────────────────────────────────────
   if (stage === 'input') return (
-    <div className="min-h-screen bg-[#080810] text-white flex flex-col" dir={isAr ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-[#080810] text-white flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header */}
-      <div className="px-6 py-4 flex items-center justify-between border-b border-white/6">
+      <div className="px-4 sm:px-6 py-3.5 flex items-center justify-between border-b border-white/6">
         <a href="/" className="text-yellow-500 font-black text-xl">سيرتي.ai</a>
         <div className="flex gap-2">
           <button onClick={() => setLang('ar')} className={`text-xs px-3 py-1.5 rounded-lg border font-bold transition-all ${lang === 'ar' ? 'border-yellow-500/40 text-yellow-400 bg-yellow-500/10' : 'border-white/10 text-gray-500 hover:text-gray-300'}`}>🇸🇦 عربي</button>
@@ -192,23 +196,21 @@ export function GenerateClient() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 max-w-2xl mx-auto w-full">
+      <div className="flex-1 flex flex-col items-center justify-start sm:justify-center px-4 pt-8 sm:py-12 pb-8 max-w-2xl mx-auto w-full">
 
         {/* Icon + Title */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-6 sm:mb-10">
           <div className="relative inline-block mb-5">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center text-4xl shadow-lg shadow-yellow-500/20">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center text-3xl sm:text-4xl shadow-lg shadow-yellow-500/20">
               ✦
             </div>
             <div className="absolute -top-1 -right-1 w-5 h-5 bg-emerald-400 rounded-full animate-pulse border-2 border-[#080810]" />
           </div>
-          <h1 className="text-3xl font-black mb-3">
-            {isAr ? 'صف نفسك، واترك الباقي لنا' : "Describe yourself, we'll do the rest"}
+          <h1 className="text-2xl sm:text-3xl font-black mb-2 sm:mb-3">
+            {b.generateTitle}
           </h1>
           <p className="text-gray-400 text-base leading-relaxed">
-            {isAr
-              ? 'اكتب أو قل بضع جمل عن تجربتك المهنية وسنبني لك سيرة ذاتية كاملة خلال ثوانٍ'
-              : "Write or say a few sentences about your professional background and we'll generate a complete CV in seconds"}
+            {b.generateSubtitle}
           </p>
         </div>
 
@@ -218,24 +220,22 @@ export function GenerateClient() {
             ref={textareaRef}
             value={description}
             onChange={e => setDescription(e.target.value)}
-            placeholder={isAr
-              ? 'مثال: أنا مطور ويب عندي 4 سنوات خبرة، شغلت في شركتين بالمغرب وتخصصت في React وNode.js...'
-              : 'Example: I\'m a marketing manager with 6 years in FMCG, worked at Nestlé and Unilever, expert in digital campaigns...'}
-            dir={isAr ? 'rtl' : 'ltr'}
+            placeholder={b.generatePlaceholder}
+            dir={isRTL ? 'rtl' : 'ltr'}
             rows={5}
-            className="w-full bg-[#111118] border border-white/10 rounded-2xl px-5 py-4 text-base text-white placeholder-gray-600 focus:border-yellow-500/50 focus:outline-none resize-none transition-colors leading-relaxed"
+            className="w-full bg-[#111118] border border-white/10 rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4 text-base text-white placeholder-gray-600 focus:border-yellow-500/50 focus:outline-none resize-none transition-colors leading-relaxed"
             style={{ minHeight: 140 }}
           />
           {/* Voice button */}
           {isSupported && (
             <button
               onClick={toggleVoice}
-              className={`absolute bottom-4 ${isAr ? 'left-4' : 'right-4'} w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+              className={`absolute bottom-4 ${isRTL ? 'left-4' : 'right-4'} w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
                 isListening
                   ? 'bg-red-500/20 border border-red-500/50 text-red-400 animate-pulse'
                   : 'bg-white/5 border border-white/10 text-gray-400 hover:text-yellow-400 hover:border-yellow-500/30'
               }`}
-              title={isListening ? (isAr ? 'إيقاف التسجيل' : 'Stop recording') : (isAr ? 'تحدث الآن' : 'Speak now')}
+              title={isListening ? (b.genStopRecording) : (b.genSpeakNow)}
             >
               {isListening ? '⏹' : '🎙'}
             </button>
@@ -246,13 +246,13 @@ export function GenerateClient() {
         {isListening && (
           <div className="flex items-center gap-2 text-sm text-red-400 mb-4">
             <span className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
-            {isAr ? 'يستمع… تحدث الآن' : 'Listening… speak now'}
+            {b.genListening}
           </div>
         )}
 
         {/* Example chips */}
         <div className="w-full mb-6">
-          <p className="text-xs text-gray-600 mb-2 uppercase tracking-widest">{isAr ? 'أمثلة' : 'Examples'}</p>
+          <p className="text-xs text-gray-600 mb-2 uppercase tracking-widest">{b.voiceInput}</p>
           <div className="flex flex-wrap gap-2">
             {EXAMPLES.map((ex, i) => (
               <button
@@ -270,14 +270,14 @@ export function GenerateClient() {
         <button
           onClick={generate}
           disabled={!description.trim()}
-          className="w-full py-4 rounded-2xl bg-gradient-to-r from-yellow-500 to-yellow-400 text-black font-black text-lg hover:from-yellow-400 hover:to-yellow-300 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-3"
+          className="w-full py-4 sm:py-4 rounded-2xl bg-gradient-to-r from-yellow-500 to-yellow-400 text-black font-black text-base sm:text-lg active:scale-98 hover:from-yellow-400 hover:to-yellow-300 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-3"
         >
           <span>✦</span>
-          {isAr ? 'أنشئ سيرتي الذاتية' : 'Generate my CV'}
+          {b.generateBtn}
         </button>
 
         <p className="text-xs text-gray-700 mt-4 text-center">
-          {isAr ? 'يستغرق حوالي 10-15 ثانية • يمكنك تعديل كل شيء بعدها' : 'Takes ~10-15 seconds • You can edit everything after'}
+          {b.genTakes}
         </p>
       </div>
     </div>
@@ -302,7 +302,7 @@ export function GenerateClient() {
         </div>
 
         <h2 className="text-2xl font-black mb-3">
-          {isAr ? 'نبني سيرتك الذاتية…' : 'Building your CV…'}
+          {b.generating}
         </h2>
         <p className="text-yellow-400 text-sm font-semibold mb-8 min-h-[1.5em] transition-all">
           {STEPS_AR[generatingStep]}
@@ -324,10 +324,10 @@ export function GenerateClient() {
     <div className="min-h-screen bg-[#080810] text-white flex flex-col items-center justify-center px-4">
       <div className="text-center max-w-sm">
         <div className="text-5xl mb-4">⚠️</div>
-        <h2 className="text-xl font-bold mb-2">{isAr ? 'حدث خطأ' : 'Something went wrong'}</h2>
+        <h2 className="text-xl font-bold mb-2">{b.genError}</h2>
         <p className="text-gray-400 text-sm mb-6">{error}</p>
         <button onClick={() => setStage('input')} className="bg-yellow-500 text-black px-6 py-3 rounded-xl font-bold hover:bg-yellow-400 transition-all">
-          {isAr ? 'حاول مرة أخرى' : 'Try again'}
+          {b.genRetry}
         </button>
       </div>
     </div>
@@ -337,14 +337,14 @@ export function GenerateClient() {
   if (stage === 'preview' && generatedCV) {
     const p = generatedCV.personal
     return (
-      <div className="min-h-screen bg-[#080810] text-white" dir={isAr ? 'rtl' : 'ltr'}>
+      <div className="min-h-screen bg-[#080810] text-white" dir={isRTL ? 'rtl' : 'ltr'}>
         {/* Header */}
         <div className="sticky top-0 z-40 bg-[#080810]/95 backdrop-blur border-b border-white/8 px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <a href="/" className="text-yellow-500 font-black text-lg">سيرتي.ai</a>
             <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/25 rounded-lg px-3 py-1">
               <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-              <span className="text-xs text-emerald-400 font-semibold">{isAr ? 'تم الإنشاء!' : 'Generated!'}</span>
+              <span className="text-xs text-emerald-400 font-semibold">{b.genDone}</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -352,13 +352,13 @@ export function GenerateClient() {
               onClick={() => setStage('input')}
               className="text-xs text-gray-400 hover:text-white border border-white/10 px-3 py-1.5 rounded-lg transition-colors"
             >
-              {isAr ? '← وصف جديد' : '← New description'}
+              {b.genNewDesc}
             </button>
             <button
               onClick={applyAndEdit}
               className="bg-yellow-500 hover:bg-yellow-400 text-black font-black text-sm px-5 py-2 rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-yellow-500/20"
             >
-              ✎ {isAr ? 'تعديل السيرة' : 'Edit CV'}
+              {b.genEditCV}
             </button>
           </div>
         </div>
@@ -397,7 +397,7 @@ export function GenerateClient() {
               {(p.summary || p.summaryEn) && (
                 <div className="bg-white/3 rounded-xl p-4 mb-6">
                   <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-2">
-                    {isAr ? 'النبذة الشخصية' : 'Summary'}
+                    {b.genSummaryLabel}
                   </div>
                   {p.summary && <p className="text-sm text-gray-300 leading-relaxed mb-2" dir="rtl">{p.summary}</p>}
                   {p.summaryEn && p.summaryEn !== p.summary && (
@@ -410,7 +410,7 @@ export function GenerateClient() {
               {generatedCV.experience.length > 0 && (
                 <div className="mb-6">
                   <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-3">
-                    {isAr ? 'الخبرة المهنية' : 'Experience'} ({generatedCV.experience.length})
+                    {b.genExpLabel} ({generatedCV.experience.length})
                   </div>
                   <div className="space-y-3">
                     {generatedCV.experience.map((exp, i) => (
@@ -419,7 +419,7 @@ export function GenerateClient() {
                         <div>
                           <div className="text-sm font-bold">{exp.jobTitle || exp.jobTitleEn}</div>
                           <div className="text-xs text-yellow-400">{exp.company || exp.companyEn}</div>
-                          <div className="text-xs text-gray-600">{exp.startDate}{(exp.startDate && (exp.endDate || exp.isCurrent)) ? ' — ' : ''}{exp.isCurrent ? (isAr ? 'حتى الآن' : 'Present') : exp.endDate}</div>
+                          <div className="text-xs text-gray-600">{exp.startDate}{(exp.startDate && (exp.endDate || exp.isCurrent)) ? ' — ' : ''}{exp.isCurrent ? b.present : exp.endDate}</div>
                         </div>
                       </div>
                     ))}
@@ -431,7 +431,7 @@ export function GenerateClient() {
               <div className="grid grid-cols-2 gap-4">
                 {generatedCV.skills.length > 0 && (
                   <div>
-                    <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-2">{isAr ? 'المهارات' : 'Skills'}</div>
+                    <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-2">{b.genSkillsLabel}</div>
                     <div className="flex flex-wrap gap-1.5">
                       {generatedCV.skills.slice(0, 8).map((s, i) => (
                         <span key={i} className="text-xs bg-white/5 border border-white/10 text-gray-300 px-2.5 py-1 rounded-lg">{s.name}</span>
@@ -441,12 +441,12 @@ export function GenerateClient() {
                 )}
                 {generatedCV.languages.length > 0 && (
                   <div>
-                    <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-2">{isAr ? 'اللغات' : 'Languages'}</div>
+                    <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-2">{b.genLangsLabel}</div>
                     <div className="space-y-1">
                       {generatedCV.languages.map((l, i) => (
                         <div key={i} className="flex items-center gap-2">
                           <span className="text-xs text-gray-300">{l.name}</span>
-                          <span className="text-xs text-gray-600">— {l.level === 'native' ? (isAr ? 'أصلية' : 'Native') : l.level}</span>
+                          <span className="text-xs text-gray-600">— {l.level === 'native' ? (b.genLangsLabel === b.genLangsLabel ? (locale === 'ar' ? 'أصلية' : locale === 'fr' ? 'Natif' : 'Native') : 'Native') : l.level}</span>
                         </div>
                       ))}
                     </div>
@@ -458,9 +458,9 @@ export function GenerateClient() {
 
           {/* ── Template chooser ─────────────────────────────────────── */}
           <div>
-            <h3 className="text-lg font-black mb-1">{isAr ? 'اختر القالب المناسب لك' : 'Choose your template'}</h3>
+            <h3 className="text-lg font-black mb-1">{b.chooseTemplate}</h3>
             <p className="text-sm text-gray-500 mb-5">
-              {isAr ? 'اخترنا لك هذا القالب تلقائياً — يمكنك تغييره' : "We auto-selected this template — feel free to change it"}
+              {b.genAutoTemplate}
             </p>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
               {TEMPLATE_OPTIONS.map(t => (
@@ -479,10 +479,10 @@ export function GenerateClient() {
                   {/* Color swatch */}
                   <div className="w-8 h-8 rounded-lg mx-auto mb-2 border border-white/10" style={{ background: t.color }} />
                   <div className={`text-xs font-bold ${selectedTemplate === t.id ? 'text-yellow-400' : 'text-gray-400'}`}>
-                    {isAr ? t.label : t.labelEn}
+                    {locale === 'ar' ? t.label : t.labelEn}
                   </div>
                   <div className="text-xs text-gray-600 mt-0.5">
-                    {isAr ? t.desc : t.descEn}
+                    {locale === 'ar' ? t.desc : t.descEn}
                   </div>
                 </button>
               ))}
@@ -495,13 +495,13 @@ export function GenerateClient() {
               onClick={applyAndEdit}
               className="flex-1 py-4 rounded-2xl bg-gradient-to-r from-yellow-500 to-yellow-400 text-black font-black text-lg hover:from-yellow-400 hover:to-yellow-300 transition-all shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2"
             >
-              ✎ {isAr ? 'تعديل وتخصيص السيرة' : 'Edit & customize CV'}
+              {b.tailorEditCustomize}
             </button>
             <button
               onClick={() => setStage('input')}
               className="sm:w-auto py-4 px-6 rounded-2xl border border-white/10 text-gray-400 hover:text-white hover:border-white/20 transition-all font-semibold"
             >
-              {isAr ? 'وصف مختلف' : 'Different description'}
+              {b.genNewDesc}
             </button>
           </div>
         </div>

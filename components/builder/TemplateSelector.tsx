@@ -1,6 +1,7 @@
 // components/builder/TemplateSelector.tsx
 'use client'
 import { useCVStore } from '@/lib/store'
+import { useT } from '@/lib/i18n/context'
 import { TEMPLATES } from '@/components/cv/templates'
 
 export function TemplateSelector() {
@@ -8,12 +9,12 @@ export function TemplateSelector() {
   const cvMode         = useCVStore((s) => s.cv.cvMode)
   const updateTemplate = useCVStore((s) => s.updateTemplate)
 
-  const isEn = cvMode === 'en'
+  const { t } = useT()
 
   return (
     <div>
       <p className="text-xs text-gray-600 uppercase tracking-widest mb-3">
-        {isEn ? 'Template' : 'القالب'}
+        {t.builder.chooseTemplate}
       </p>
       <div className="space-y-1">
         {TEMPLATES.map((t) => (

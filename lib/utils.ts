@@ -17,3 +17,9 @@ export function formatDate(date: string) {
 export function generateId() {
   return Math.random().toString(36).substr(2, 9)
 }
+
+// ── Re-export utils submodules so routes can import from '@/lib/utils' ────────
+export * from './utils/httpResponse'
+export * from './utils/logger'
+export * from './utils/idGuard'
+export * from './utils/mobileValidate'

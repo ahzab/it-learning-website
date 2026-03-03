@@ -2,6 +2,7 @@
 // components/builder/widgets/SkillsBoard.tsx
 import { useState, useRef } from 'react'
 import { useCVStore } from '@/lib/store'
+import { useT } from '@/lib/i18n/context'
 
 const LEVELS = ['beginner','intermediate','advanced','expert'] as const
 const LEVEL_CFG = {
@@ -38,7 +39,10 @@ function LevelDots({ level, onChange }: { level:string; onChange:(l:string)=>voi
   )
 }
 
-export function SkillsBoard({ isEn }: { isEn:boolean }) {
+export function SkillsBoard() {
+  const { t, isRTL } = useT()
+  const b = t.builder
+  const isEn = !isRTL
   const skills     = useCVStore(s=>s.cv.skills)
   const addSkill   = useCVStore(s=>s.addSkill)
   const removeSkill= useCVStore(s=>s.removeSkill)

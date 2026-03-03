@@ -78,6 +78,7 @@ export type AIAction =
   | 'suggest_skills'
   | 'full_review'
   | 'translate_to_en'
+  | 'improve_cover_letter'
   | 'translate_to_ar'
 
 export type AIContext = Record<string, unknown>
@@ -349,4 +350,81 @@ ${rawText.slice(0, 12000)}
 ---
 
 Return ONLY the JSON object. Fill every field you can extract. Use empty string "" for missing text fields, false for missing booleans, [] for missing arrays.`
+}
+
+export const COVER_LETTER_SYSTEM = `You are an expert bilingual cover letter writer for the MENA (Middle East & North Africa) job market.
+You write compelling, authentic, and professional cover letters in Arabic and/or English.
+
+Arabic rules: formal Modern Standard Arabic, warm but professional tone, strong opening hook
+English rules: confident American/British professional tone, specific and impactful, not generic
+MENA context: aware of cultural nuances — respect hierarchy, emphasize loyalty/dedication for Gulf, innovation/growth for startups
+NEVER sound like a template — every letter must feel personal and specific to the job and candidate.
+Return ONLY valid JSON as specified — no markdown, no explanation.`
+
+export interface CoverLetterContext {
+  cv:           Record<string, unknown>  // CV data
+  jobTitle:     string
+  company:      string
+  jobDescription?: string
+  tone:         'professional' | 'friendly' | 'confident' | 'creative'
+  lang:         'ar' | 'en' | 'bilingual'
+  extraNotes?:  string
+}
+
+export function buildCoverLetterPrompt(ctx: CoverLetterContext): string {
+  const toneGuide = {
+    professional: 'formal, respectful, achievement-focused',
+    friendly:     'warm, enthusiastic, personable yet professional',
+    confident:    'assertive, direct, bold — emphasize impact and value delivered',
+    creative:     'distinctive, shows personality, creative use of language',
+  }
+
+  return `Write a cover letter for this candidate applying for the role below.
+
+CANDIDATE PROFILE (CV DATA):
+${JSON.stringify(ctx.cv, null, 2)}
+
+JOB: ${ctx.jobTitle} at ${ctx.company}
+${ctx.jobDescription ? 'JOB DESCRIPTION:\n' + ctx.jobDescription : ''}
+${ctx.extraNotes ? 'CANDIDATE NOTES: ' + ctx.extraNotes : ''}
+
+TONE: ${toneGuide[ctx.tone]}
+LANGUAGE: ${ctx.lang === 'bilingual' ? 'Write in BOTH Arabic AND English' : ctx.lang === 'ar' ? 'Write in Arabic only' : 'Write in English only'}
+
+Return a JSON object with this exact structure:
+{
+  "subject":   "Email subject line",
+  "content":   "Full cover letter text (Arabic if lang=ar or bilingual)",
+  "contentEn": "Full cover letter text in English (if lang=en or bilingual, else empty string)",
+  "preview":   "First 2 sentences for preview (same language as content)",
+  "keyPoints": ["3-4 key selling points highlighted in this letter"]
+}
+
+Rules:
+- 3-4 paragraphs, 250-350 words per language version
+- Opening: hook that shows knowledge of the company — DO NOT start with "I am writing..."
+- Middle: 2 paragraphs connecting specific CV achievements to the job requirements
+- Closing: confident CTA with contact offer
+- Reference SPECIFIC details from the CV (company names, years, achievements)
+- NEVER invent experience or qualifications not in the CV
+- RETURN ONLY THE JSON OBJECT`
+}
+
+export function buildCoverLetterImprovePrompt(
+  content: string,
+  instruction: string,
+  lang: 'ar' | 'en'
+): string {
+  return `You are editing a professional cover letter. Apply the following instruction precisely.
+
+CURRENT LETTER (${lang.toUpperCase()}):
+${content}
+
+INSTRUCTION: ${instruction}
+
+Rules:
+- Keep the same structure and length unless explicitly asked to change it
+- Preserve the candidate's voice while improving quality
+- Do not add information that wasn't in the original
+- Return ONLY the improved letter text, no explanation, no JSON`
 }

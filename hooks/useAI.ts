@@ -40,22 +40,31 @@ export function useAI({ onComplete }: UseAIOptions = {}) {
           return
         }
 
+        let buffer = ''
+
         while (true) {
           const { done, value } = await reader.read()
           if (done) break
 
-          const chunk = decoder.decode(value)
-          const lines = chunk.split('\n')
+          buffer += decoder.decode(value, { stream: true })
+          const lines = buffer.split('\n')
+          buffer = lines.pop() ?? ''   // keep incomplete last line
 
           for (const line of lines) {
             if (!line.startsWith('data: ')) continue
             const data = line.slice(6).trim()
-            if (data === '[DONE]') continue
+            if (!data || data === '[DONE]') continue
 
             try {
               const parsed = JSON.parse(data)
 
-              // Anthropic streaming format
+              // Unified format emitted by gemini.ts: { type: 'delta', text: '...' }
+              if (parsed.type === 'delta' && parsed.text) {
+                fullText += parsed.text
+                setStreaming(fullText)
+              }
+
+              // Legacy Anthropic format (kept for backward compat during transition)
               if (parsed.type === 'content_block_delta') {
                 const text = parsed.delta?.text || ''
                 fullText += text

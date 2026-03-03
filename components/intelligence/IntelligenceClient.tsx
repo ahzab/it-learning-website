@@ -1,4 +1,5 @@
 'use client'
+import { useT } from '@/lib/i18n/context'
 // components/intelligence/IntelligenceClient.tsx
 // Thin client wrapper — passes server-fetched CV data into the dashboard.
 
@@ -10,7 +11,9 @@ interface Props {
   isAr: boolean
 }
 
-export function IntelligenceClient({ cvData, cvTitle, isAr }: Props) {
+export function IntelligenceClient({ cvData, cvTitle, isAr: isArProp }: Props) {
+  const { isRTL } = useT()
+  const isAr = isRTL // use UI locale, not URL param
   return (
     <IntelligenceDashboard
       cvData={cvData}

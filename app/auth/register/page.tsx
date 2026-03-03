@@ -35,7 +35,7 @@ export default function RegisterPage() {
         const data = await res.json()
         // Map server field errors into hook so they show inline
         if (data.fields) v.setServerErrors(data.fields)
-        else setApiError(data.error || 'حدث خطأ')
+        else setApiError(data.error || a.genericError)
         setLoading(false)
         return
       }
@@ -43,7 +43,7 @@ export default function RegisterPage() {
       v.reset()
       router.push('/builder')
     } catch {
-      setApiError('حدث خطأ في الاتصال')
+      setApiError(a.connectionError)
       setLoading(false)
     }
   }
@@ -76,9 +76,7 @@ export default function RegisterPage() {
     : (pw.length >= 10 && /[A-Za-z]/.test(pw) && /[0-9]/.test(pw)) ? 3
     : 2
   const pwColors = ['', '#EF4444', '#F59E0B', '#22C55E', '#22C55E']
-  const pwLabels = isRTL
-    ? ['', 'ضعيفة جداً', 'ضعيفة', 'جيدة', 'قوية جداً']
-    : ['', 'Too weak', 'Weak', 'Good', 'Strong']
+  const pwLabels = a.passwordStrengths
 
   const nameErr     = v.fieldError('name')
   const emailErr    = v.fieldError('email')

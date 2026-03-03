@@ -7,17 +7,17 @@ export function TestimonialsSection() {
   const s = t.testimonials
 
   return (
-    <section className="py-28 px-6 relative overflow-hidden" style={{background:'#0A0A10'}}>
+    <section className="py-16 sm:py-24 px-4 sm:px-6 relative overflow-hidden" style={{background:'#0A0A10'}}>
       <div className="absolute inset-0 arabesque-bg opacity-15 pointer-events-none" />
       <div className="relative max-w-7xl mx-auto">
 
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 sm:mb-16">
           <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.25em] mb-5" style={{color:'#C9A84C'}}>
             <span className="w-8 h-px" style={{background:'linear-gradient(90deg,transparent,#C9A84C)'}} />
             {s.sectionLabel}
             <span className="w-8 h-px" style={{background:'linear-gradient(90deg,#C9A84C,transparent)'}} />
           </div>
-          <h2 className="text-4xl lg:text-5xl font-black text-[#F0EBE0] leading-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#F0EBE0] leading-tight">
             {s.headline1}
             <br />
             <span style={{background:'linear-gradient(135deg,#E8C97A,#C9A84C)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text'}}>
@@ -26,10 +26,10 @@ export function TestimonialsSection() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           {s.list.map((item, i) => (
             <div key={item.name}
-              className="relative rounded-2xl p-7 border transition-all duration-300 hover:-translate-y-1 group"
+              className="relative rounded-2xl p-5 sm:p-7 border transition-all duration-300 hover:-translate-y-1 group"
               style={{
                 background: i === 0 ? 'linear-gradient(135deg, rgba(201,168,76,0.05) 0%, rgba(255,255,255,0.015) 100%)' : 'rgba(255,255,255,0.018)',
                 borderColor: i === 0 ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.06)',

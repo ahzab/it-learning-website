@@ -1,6 +1,7 @@
 'use client'
 // components/builder/widgets/ExperienceCard.tsx
 import { useState } from 'react'
+import { useT } from '@/lib/i18n/context'
 import { Experience } from '@/types/cv'
 import { DateRangePicker } from './DateRangePicker'
 import { SmartInput } from './SmartInput'
@@ -46,7 +47,14 @@ interface Props {
 export function ExperienceCard({ exp, index, mode, total, onUpdate, onRemove, onMoveUp, onMoveDown }: Props) {
   const [open, setOpen] = useState(index === 0)
   const [del,  setDel]  = useState(false)
-  const isEn = mode === 'en', isBi = mode === 'bilingual'
+  const { t, locale } = useT()
+  const b = t.builder
+
+  // CV content mode (ar/en/bilingual) — controls which DB fields to use
+  const isEn = mode === 'en'
+  const isBi = mode === 'bilingual'
+  const cvDir = isEn ? 'ltr' : 'rtl'
+
   const pct     = calcPct(exp, mode)
   const title   = isEn ? (exp.jobTitleEn || exp.jobTitle) : exp.jobTitle
   const company = isEn ? (exp.companyEn  || exp.company)  : exp.company
@@ -72,11 +80,11 @@ export function ExperienceCard({ exp, index, mode, total, onUpdate, onRemove, on
             <>
               <div className="text-sm font-bold text-white truncate">{title}</div>
               <div className="text-xs text-gray-500 truncate">
-                {company}{exp.startDate && ` · ${exp.startDate}${exp.isCurrent ? (isEn ? ' – Present' : ' – حتى الآن') : exp.endDate ? ` – ${exp.endDate}` : ''}`}
+                {company}{exp.startDate && ` · ${exp.startDate}${exp.isCurrent ? (` – ${b.present}`) : exp.endDate ? ` – ${exp.endDate}` : ''}`}
               </div>
             </>
           ) : (
-            <div className="text-sm text-gray-600 italic">{isEn ? 'New experience — click to fill' : 'خبرة جديدة — انقر للتعبئة'}</div>
+            <div className="text-sm text-gray-600 italic">{b.newExperience}</div>
           )}
         </div>
         <CompletionDot pct={pct} />
@@ -85,7 +93,7 @@ export function ExperienceCard({ exp, index, mode, total, onUpdate, onRemove, on
 
       {/* ── Body ── */}
       {open && (
-        <div className="px-4 pb-5 pt-1 space-y-4 border-t border-white/6">
+        <div className="px-3 sm:px-4 pb-5 pt-2 space-y-4 border-t border-white/6">
           {isBi ? (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -104,17 +112,17 @@ export function ExperienceCard({ exp, index, mode, total, onUpdate, onRemove, on
           ) : (
             <div className="space-y-3">
               <SmartInput
-                label={isEn ? 'Job Title' : 'المسمى الوظيفي'}
+                label={b.jobTitleLabel}
                 value={isEn ? (exp.jobTitleEn || '') : (exp.jobTitle || '')}
                 onChange={v => isEn ? onUpdate({ jobTitleEn: v }) : onUpdate({ jobTitle: v })}
-                dir={isEn ? 'ltr' : 'rtl'} icon="💼"
+                dir={cvDir} icon="💼"
                 error={fe(isEn ? 'jobTitleEn' : 'jobTitle')}
                 onBlur={touch(isEn ? 'jobTitleEn' : 'jobTitle')} />
               <SmartInput
-                label={isEn ? 'Company' : 'الشركة'}
+                label={b.companyLabel}
                 value={isEn ? (exp.companyEn || '') : (exp.company || '')}
                 onChange={v => isEn ? onUpdate({ companyEn: v }) : onUpdate({ company: v })}
-                dir={isEn ? 'ltr' : 'rtl'} icon="🏢"
+                dir={cvDir} icon="🏢"
                 error={fe(isEn ? 'companyEn' : 'company')}
                 onBlur={touch(isEn ? 'companyEn' : 'company')} />
             </div>
@@ -124,14 +132,13 @@ export function ExperienceCard({ exp, index, mode, total, onUpdate, onRemove, on
             startDate={exp.startDate} endDate={exp.endDate} isCurrent={exp.isCurrent}
             onStartChange={s => onUpdate({ startDate: s })}
             onEndChange={e => onUpdate({ endDate: e })}
-            onCurrentChange={c => onUpdate({ isCurrent: c })}
-            isEn={isEn} />
+            onCurrentChange={c => onUpdate({ isCurrent: c })} />
 
           {/* Description */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] text-gray-600 uppercase tracking-widest font-bold">
-                {isBi ? 'الوصف / Description' : isEn ? 'Description & Achievements' : 'الوصف والإنجازات'}
+                {isBi ? b.descriptionBiLabel : b.descriptionLabel}
               </span>
               {(exp.jobTitle || exp.jobTitleEn) && (
                 <AIButton action="improve_experience"
@@ -139,10 +146,10 @@ export function ExperienceCard({ exp, index, mode, total, onUpdate, onRemove, on
                     jobTitle:    isEn ? (exp.jobTitleEn || exp.jobTitle) : exp.jobTitle,
                     company:     isEn ? (exp.companyEn  || exp.company)  : exp.company,
                     description: isEn ? (exp.descriptionEn || exp.description || 'none') : (exp.description || 'none'),
-                    lang: isEn ? 'en' : 'ar',
+                    lang: isEn ? 'en' : locale === 'fr' ? 'fr' : 'ar',
                   }}
-                  label={isEn ? '✦ AI Write' : '✦ اكتب AI'}
-                  onApply={t => isEn ? onUpdate({ descriptionEn: t.trim() }) : onUpdate({ description: t.trim() })} />
+                  label={b.aiWriteBtn}
+                  onApply={text => isEn ? onUpdate({ descriptionEn: text.trim() }) : onUpdate({ description: text.trim() })} />
               )}
             </div>
             {isBi ? (
@@ -156,11 +163,11 @@ export function ExperienceCard({ exp, index, mode, total, onUpdate, onRemove, on
               </div>
             ) : (
               <SmartInput
-                label={isEn ? 'Describe your achievements...' : 'صف إنجازاتك...'}
+                label={b.descriptionPlaceholder}
                 value={isEn ? (exp.descriptionEn || '') : (exp.description || '')}
                 onChange={v => isEn ? onUpdate({ descriptionEn: v }) : onUpdate({ description: v })}
-                dir={isEn ? 'ltr' : 'rtl'} multiline rows={4} maxLength={800}
-                hint={isEn ? 'Tip: use numbers — "Increased sales by 35%"' : 'نصيحة: استخدم أرقام — "زدت المبيعات بنسبة 35%"'}
+                dir={cvDir} multiline rows={4} maxLength={800}
+                hint={b.descriptionHint}
                 error={fe(isEn ? 'descriptionEn' : 'description')}
                 onBlur={touch(isEn ? 'descriptionEn' : 'description')} />
             )}
@@ -170,12 +177,12 @@ export function ExperienceCard({ exp, index, mode, total, onUpdate, onRemove, on
           <div className="flex justify-between items-center pt-1 border-t border-white/5">
             <div className="flex items-center gap-1.5">
               <div className={`w-1.5 h-1.5 rounded-full ${pct === 100 ? 'bg-emerald-400' : pct >= 40 ? 'bg-yellow-500' : 'bg-gray-700'}`} />
-              <span className="text-xs text-gray-700">{pct}% {isEn ? 'complete' : 'مكتمل'}</span>
+              <span className="text-xs text-gray-700">{pct}% {b.completeLabel}</span>
             </div>
             <button
               onClick={() => { if (del) { onRemove() } else { setDel(true); setTimeout(() => setDel(false), 2500) } }}
               className={`text-xs px-3 py-1.5 rounded-lg transition-all ${del ? 'bg-red-500/15 border border-red-500/30 text-red-400 font-bold' : 'text-gray-700 hover:text-red-400 hover:bg-red-500/8'}`}>
-              {del ? (isEn ? '✕ Confirm delete' : '✕ تأكيد الحذف') : (isEn ? 'Remove' : 'حذف')}
+              {del ? b.confirmDelete : b.removeBtn}
             </button>
           </div>
         </div>

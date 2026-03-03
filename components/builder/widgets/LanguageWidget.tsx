@@ -2,6 +2,7 @@
 // components/builder/widgets/LanguageWidget.tsx
 import { useState } from 'react'
 import { useCVStore } from '@/lib/store'
+import { useT } from '@/lib/i18n/context'
 
 const LEVEL_INFO = {
   basic:         { pct:20, ar:'أساسي',    en:'Basic',          color:'#64748B' },
@@ -20,7 +21,9 @@ const QUICK = [
   {name:'الصينية',  nameEn:'Chinese', flag:'🇨🇳'},
 ]
 
-export function LanguageWidget({ isEn }: { isEn: boolean }) {
+export function LanguageWidget() {
+  const { t, isRTL } = useT()
+  const isEn = !isRTL
   const languages        = useCVStore(s=>s.cv.languages)
   const addLang          = useCVStore(s=>s.addLanguageItem)
   const updateLang       = useCVStore(s=>s.updateLanguageItem)

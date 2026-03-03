@@ -12,18 +12,18 @@ export function PricingSection() {
   const goldText = { background:'linear-gradient(135deg,#E8C97A,#C9A84C)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }
 
   return (
-    <section id="pricing" className="py-28 px-6 relative overflow-hidden" style={{background:'#060608'}}>
+    <section id="pricing" className="py-16 sm:py-24 px-4 sm:px-6 relative overflow-hidden" style={{background:'#060608'}}>
       <div className="absolute inset-0 arabesque-bg opacity-20 pointer-events-none" />
       <div className="absolute top-0 inset-x-0 h-px" style={{background:'linear-gradient(90deg,transparent,rgba(201,168,76,0.15) 50%,transparent)'}} />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full pointer-events-none"
         style={{background:'radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%)'}} />
 
       <div className="relative max-w-6xl mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 sm:mb-16">
           <div className="text-[10px] font-bold uppercase tracking-[0.25em] mb-5" style={{color:'#C9A84C'}}>
             — {p.sectionLabel}
           </div>
-          <h2 className="text-4xl lg:text-5xl font-black leading-[1.1] mb-4 text-[#F0EBE0]">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.1] mb-4 text-[#F0EBE0]">
             {p.headline1}
             <br />
             <span style={goldText}>{p.headline2}</span>
@@ -31,19 +31,19 @@ export function PricingSection() {
           <p className="text-[#6B6672] text-base max-w-md mx-auto">{p.subtext}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6 mb-8 sm:mb-12">
           {p.plans.map(plan => {
-            const isFeatured = plan.id === 'basic'
+            const isFeatured = plan.id === 'starter'
             const isHovered  = hovered === plan.id
             return (
               <div key={plan.id}
-                className="relative rounded-2xl p-6 border flex flex-col transition-all duration-300"
+                className="relative rounded-2xl p-5 sm:p-6 border flex flex-col transition-all duration-300"
                 style={{
                   background: isFeatured
                     ? 'linear-gradient(135deg,rgba(201,168,76,0.08) 0%,rgba(255,255,255,0.025) 100%)'
                     : isHovered ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.02)',
                   borderColor: isFeatured ? 'rgba(201,168,76,0.35)' : 'rgba(255,255,255,0.07)',
-                  transform: isFeatured ? 'scale(1.03)' : isHovered ? 'translateY(-4px)' : 'none',
+                  transform: isFeatured ? 'none' : isHovered ? 'translateY(-4px)' : 'none',
                   boxShadow: isFeatured ? '0 0 60px rgba(201,168,76,0.12)' : 'none',
                 }}
                 onMouseEnter={() => !isFeatured && setHovered(plan.id)}
@@ -89,8 +89,8 @@ export function PricingSection() {
                   ))}
                 </ul>
 
-                <Link href={plan.id === 'free' ? '/generate' : '/auth/register'}
-                  className="block w-full text-center py-3 rounded-xl text-sm font-black transition-all duration-300 hover:-translate-y-0.5"
+                <Link href={plan.id === 'free' ? '/generate' : plan.id === 'starter' ? '/api/payment/checkout?plan=STARTER' : '/api/payment/checkout?plan=PRO'}
+                  className="block w-full text-center py-3.5 rounded-xl text-sm font-black transition-all duration-300 active:scale-98 sm:hover:-translate-y-0.5"
                   style={isFeatured
                     ? {background:'linear-gradient(135deg,#E8C97A,#C9A84C)', color:'#000', boxShadow:'0 0 25px rgba(201,168,76,0.3)'}
                     : {background:'rgba(255,255,255,0.06)', color:'#9994A0', border:'1px solid rgba(255,255,255,0.1)'}}>

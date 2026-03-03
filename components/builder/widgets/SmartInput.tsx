@@ -45,7 +45,7 @@ export function SmartInput({
 
   const padL = icon && dir !== 'rtl' ? (floating ? '14px' : '38px') : '14px'
   const padR = icon && dir === 'rtl'  ? (floating ? '14px' : '38px') : '14px'
-  const inputPad = { paddingTop: multiline ? '26px' : '20px', paddingBottom: '7px', paddingLeft: padL, paddingRight: padR }
+  const inputPad = { paddingTop: multiline ? '26px' : '22px', paddingBottom: '8px', paddingLeft: padL, paddingRight: padR }
 
   const inputClass = 'w-full bg-transparent text-sm text-white outline-none resize-none placeholder-transparent transition-all duration-200'
 

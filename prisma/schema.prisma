@@ -12,27 +12,31 @@ datasource db {
 // USER
 // ─────────────────────────────────────
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  password      String?
-  image         String?
-  plan          Plan      @default(FREE)
-  stripeCustomerId String? @unique
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id               String    @id @default(cuid())
+  name             String?
+  email            String    @unique
+  emailVerified    DateTime?
+  password         String?
+  image            String?
+  plan             Plan      @default(FREE)
+  stripeCustomerId String?   @unique
+  // AI usage tracking — resets monthly for PRO, lifetime for STARTER/FREE
+  aiCreditsUsed    Int       @default(0)
+  aiCreditsReset   DateTime? // next monthly reset date for PRO users
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   accounts Account[]
   sessions Session[]
-  cvs      CV[]
-  payments Payment[]
+  cvs          CV[]
+  payments     Payment[]
+  coverLetters CoverLetter[]
 }
 
 enum Plan {
-  FREE
-  BASIC    // $7 one-time
-  PRO      // $15/month
+  FREE      // 3 AI credits, 1 CV, 2 templates, watermarked PDF
+  STARTER   // $4.99 one-time — 20 AI credits, 3 CVs, all templates, clean PDF
+  PRO       // $12/month — unlimited AI, unlimited CVs, Career Intelligence
 }
 
 // ─────────────────────────────────────
@@ -115,4 +119,44 @@ enum PaymentStatus {
   SUCCEEDED
   FAILED
   REFUNDED
+}
+
+// ─────────────────────────────────────
+// COVER LETTER
+// ─────────────────────────────────────
+model CoverLetter {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String   @default("خطاب تقديم")
+  language  Language @default(AR)
+  tone      String   @default("professional")
+  content   String   @db.Text
+  contentEn String?  @db.Text
+  jobTitle  String?
+  company   String?
+  cvId      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────
+// OBSERVABILITY
+// ─────────────────────────────────────
+model AuditLog {
+  id         String   @id @default(cuid())
+  event      String   // EventName from observability/index.ts
+  userId     String?
+  plan       String?
+  ip         String?
+  severity   String   @default("info")   // info | warn | critical
+  durationMs Int?
+  meta       String?  @db.Text           // JSON blob of extra data
+  createdAt  DateTime @default(now())
+
+  @@index([event])
+  @@index([userId])
+  @@index([severity, createdAt])
+  @@index([createdAt])
 }

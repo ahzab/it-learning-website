@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   try { body = await req.json() } catch { return err('Invalid JSON body', 400, 'INVALID_JSON') }
 
   const parsed = checkoutSchema.safeParse(body)
-  if (!parsed.success) return err('plan must be BASIC or PRO', 400, 'INVALID_PLAN')
+  if (!parsed.success) return err('plan must be STARTER or PRO', 400, 'INVALID_PLAN')
 
   const dbUser = await prisma.user.findUnique({ where: { id: user.id }, select: { email: true } })
   if (!dbUser?.email) return err('User not found', 404, 'NOT_FOUND')

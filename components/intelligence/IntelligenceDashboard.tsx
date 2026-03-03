@@ -5,6 +5,7 @@
 // amber data accents. Monospace numbers, animated reveals, pulsing health ring.
 
 import { useState, useEffect, useRef } from 'react'
+import { useT } from '@/lib/i18n/context'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -82,6 +83,8 @@ function HealthRing({ score, label, labelEn, summary, summaryEn, isAr }: {
   score: number; label: string; labelEn: string
   summary: string; summaryEn: string; isAr: boolean
 }) {
+  const { t, isRTL } = useT()
+  const b = t.builder
   const [displayed, setDisplayed] = useState(0)
   const r = 56, circ = 2 * Math.PI * r
   const dash = (displayed / 100) * circ
@@ -100,7 +103,7 @@ function HealthRing({ score, label, labelEn, summary, summaryEn, isAr }: {
   }, [score])
 
   return (
-    <div className="flex items-center gap-8">
+    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-8">
       {/* Ring */}
       <div className="relative flex-shrink-0">
         <svg width="148" height="148" viewBox="0 0 148 148" style={{ transform: 'rotate(-90deg)' }}>
@@ -125,12 +128,12 @@ function HealthRing({ score, label, labelEn, summary, summaryEn, isAr }: {
       {/* Text */}
       <div className="flex-1 min-w-0">
         <div className="text-xs font-mono uppercase tracking-[0.2em] text-gray-600 mb-1">
-          {isAr ? 'مستوى الصحة المهنية' : 'Career Health Score'}
+          {b.intelCareerHealth}
         </div>
         <div className="text-2xl font-black mb-2" style={{ color }}>
           {isAr ? label : labelEn}
         </div>
-        <p className="text-sm text-gray-400 leading-relaxed" dir={isAr ? 'rtl' : 'ltr'}>
+        <p className="text-sm text-gray-400 leading-relaxed" dir={isRTL ? 'rtl' : 'ltr'}>
           {isAr ? summary : summaryEn}
         </p>
       </div>
@@ -139,6 +142,8 @@ function HealthRing({ score, label, labelEn, summary, summaryEn, isAr }: {
 }
 
 function SalaryPanel({ data, isAr }: { data: Intelligence['salaryIntel'], isAr: boolean }) {
+  const { t, isRTL } = useT()
+  const b = t.builder
   const [hovered, setHovered] = useState<string | null>(null)
   const maxVal = Math.max(...data.byCountry.map(c => c.max))
 
@@ -157,7 +162,7 @@ function SalaryPanel({ data, isAr }: { data: Intelligence['salaryIntel'], isAr: 
           <div className="absolute top-1 bottom-1 w-0.5 bg-amber-400 rounded-full shadow-[0_0_8px_#C9A84C]"
             style={{ left: `${((data.userEstimate - data.min) / (data.max - data.min)) * 80 + 5}%` }}>
             <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] text-amber-400 font-mono whitespace-nowrap">
-              {isAr ? 'تقديرك' : 'You'}
+              {b.intelYou}
             </div>
           </div>
           {/* Labels */}
@@ -168,9 +173,9 @@ function SalaryPanel({ data, isAr }: { data: Intelligence['salaryIntel'], isAr: 
           </div>
         </div>
         <div className="flex justify-between text-[10px] font-mono text-gray-700 mt-1 px-1">
-          <span>{isAr ? 'الأدنى' : 'Min'}</span>
-          <span>{isAr ? 'المتوسط' : 'Median'}</span>
-          <span>{isAr ? 'الأعلى' : 'Max'}</span>
+          <span>{b.intelMin}</span>
+          <span>{b.intelMedian}</span>
+          <span>{b.intelMax}</span>
         </div>
       </div>
 
@@ -211,7 +216,7 @@ function SalaryPanel({ data, isAr }: { data: Intelligence['salaryIntel'], isAr: 
 
       {/* Insight */}
       <div className="bg-amber-500/5 border border-amber-500/15 rounded-xl p-3">
-        <p className="text-xs text-amber-300/80 leading-relaxed" dir={isAr ? 'rtl' : 'ltr'}>
+        <p className="text-xs text-amber-300/80 leading-relaxed" dir={isRTL ? 'rtl' : 'ltr'}>
           💡 {isAr ? data.insight : data.insightEn}
         </p>
       </div>
@@ -222,6 +227,8 @@ function SalaryPanel({ data, isAr }: { data: Intelligence['salaryIntel'], isAr: 
 function SkillGapsPanel({ gaps, strengths, isAr }: {
   gaps: SkillGap[]; strengths: Strength[]; isAr: boolean
 }) {
+  const { t, isRTL } = useT()
+  const b = t.builder
   const [expanded, setExpanded] = useState<string | null>(null)
 
   return (
@@ -230,7 +237,7 @@ function SkillGapsPanel({ gaps, strengths, isAr }: {
       {strengths.length > 0 && (
         <div>
           <div className="text-[10px] font-mono uppercase tracking-widest text-gray-600 mb-2">
-            {isAr ? '✓ مهاراتك المطلوبة' : '✓ Your In-Demand Skills'}
+            {b.intelYourSkills}
           </div>
           <div className="flex flex-wrap gap-2">
             {strengths.map(s => (
@@ -249,7 +256,7 @@ function SkillGapsPanel({ gaps, strengths, isAr }: {
       {/* Gaps */}
       <div>
         <div className="text-[10px] font-mono uppercase tracking-widest text-gray-600 mb-2">
-          {isAr ? '⚡ فجوات المهارات' : '⚡ Skill Gaps'}
+          {b.intelSkillGaps}
         </div>
         <div className="space-y-2">
           {gaps.map(g => {
@@ -278,7 +285,7 @@ function SkillGapsPanel({ gaps, strengths, isAr }: {
                         {isAr ? cfg.ar : cfg.en}
                       </span>
                     </div>
-                    <div className="text-xs text-gray-500 mt-0.5" dir={isAr ? 'rtl' : 'ltr'}>
+                    <div className="text-xs text-gray-500 mt-0.5" dir={isRTL ? 'rtl' : 'ltr'}>
                       {isAr ? g.reason : g.reasonEn}
                     </div>
                   </div>
@@ -295,7 +302,7 @@ function SkillGapsPanel({ gaps, strengths, isAr }: {
                       <a href={g.freeResource} target="_blank" rel="noopener noreferrer"
                         className="text-xs text-blue-400 hover:text-blue-300 underline flex items-center gap-1"
                         onClick={e => e.stopPropagation()}>
-                        🔗 {isAr ? 'مصدر تعلم مجاني' : 'Free learning resource'} →
+                        {b.intelFreeResource} →
                       </a>
                     )}
                   </div>
@@ -310,6 +317,8 @@ function SkillGapsPanel({ gaps, strengths, isAr }: {
 }
 
 function MarketPulsePanel({ data, isAr }: { data: MarketPulse[], isAr: boolean }) {
+  const { t, isRTL } = useT()
+  const b = t.builder
   const [selected, setSelected] = useState(0)
   const item = data[selected]
   if (!item) return null
@@ -348,16 +357,16 @@ function MarketPulsePanel({ data, isAr }: { data: MarketPulse[], isAr: boolean }
               {mom.icon} {isAr ? mom.ar : mom.en}
             </div>
             <div className="text-2xl font-black font-mono" style={{ color: mom.color }}>+{item.growthPct}%</div>
-            <div className="text-[10px] text-gray-600">{isAr ? 'نمو سنوي' : 'Annual Growth'}</div>
+            <div className="text-[10px] text-gray-600">{b.intelAnnualGrowth}</div>
           </div>
         </div>
 
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: isAr ? 'وظائف متاحة' : 'Open Jobs', value: item.jobCount },
-            { label: isAr ? 'تطابق ملفك' : 'Profile Match', value: `${item.matchScore}%` },
-            { label: isAr ? 'كبرى الشركات' : 'Top Employer', value: item.topCompanies[0] || '—' },
+            { label: b.intelOpenJobs, value: item.jobCount },
+            { label: b.intelProfileMatch, value: `${item.matchScore}%` },
+            { label: b.intelTopEmployer, value: item.topCompanies[0] || '—' },
           ].map(stat => (
             <div key={stat.label} className="bg-white/4 rounded-xl p-2.5 text-center">
               <div className="text-base font-black font-mono text-amber-300">{stat.value}</div>
@@ -377,7 +386,7 @@ function MarketPulsePanel({ data, isAr }: { data: MarketPulse[], isAr: boolean }
 
         {/* Insight */}
         <p className="text-xs text-gray-400 leading-relaxed bg-amber-500/5 border border-amber-500/12 rounded-xl p-3"
-          dir={isAr ? 'rtl' : 'ltr'}>
+          dir={isRTL ? 'rtl' : 'ltr'}>
           💡 {isAr ? item.insight : item.insightEn}
         </p>
       </div>
@@ -386,6 +395,8 @@ function MarketPulsePanel({ data, isAr }: { data: MarketPulse[], isAr: boolean }
 }
 
 function ActionPlan({ items, isAr }: { items: ActionItem[]; isAr: boolean }) {
+  const { t, isRTL } = useT()
+  const b = t.builder
   const [done, setDone] = useState<number[]>([])
   const IMPACT = { high: '#22C55E', medium: '#C9A84C', low: '#6B7280' }
 
@@ -411,7 +422,7 @@ function ActionPlan({ items, isAr }: { items: ActionItem[]; isAr: boolean }) {
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-base">{item.icon}</span>
                 <span className={`text-sm font-bold ${isDone ? 'line-through text-gray-600' : 'text-white'}`}
-                  dir={isAr ? 'rtl' : 'ltr'}>
+                  dir={isRTL ? 'rtl' : 'ltr'}>
                   {isAr ? item.action : item.actionEn}
                 </span>
               </div>
@@ -421,9 +432,9 @@ function ActionPlan({ items, isAr }: { items: ActionItem[]; isAr: boolean }) {
                 </span>
                 <span className="text-[10px] uppercase tracking-widest font-bold"
                   style={{ color: IMPACT[item.impact] }}>
-                  {item.impact === 'high' ? (isAr ? '↑ تأثير عالي' : '↑ High Impact')
-                    : item.impact === 'medium' ? (isAr ? '→ متوسط' : '→ Medium')
-                    : (isAr ? 'منخفض' : 'Low')}
+                  {item.impact === 'high' ? (b.intelHighImpact)
+                    : item.impact === 'medium' ? (b.intelMedium)
+                    : (b.intelLow)}
                 </span>
               </div>
             </div>
@@ -439,7 +450,7 @@ function ActionPlan({ items, isAr }: { items: ActionItem[]; isAr: boolean }) {
 
       {done.length > 0 && (
         <p className="text-xs text-emerald-500 text-center font-mono">
-          ✓ {done.length}/{items.length} {isAr ? 'مكتملة' : 'completed'}
+          ✓ {done.length}/{items.length} {b.intelCompleted}
         </p>
       )}
     </div>
@@ -466,12 +477,13 @@ interface Props {
 }
 
 export function IntelligenceDashboard({ cvData, cvTitle, isAr = true }: Props) {
+  const { t, isRTL, locale } = useT()
+  const b = t.builder
   const [intel, setIntel] = useState<Intelligence | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   const lastFetchRef = useRef<string>('')
-
   const analyze = async (isRefresh = false) => {
     if (loading) return
     if (isRefresh) setRefreshing(true)
@@ -489,7 +501,7 @@ export function IntelligenceDashboard({ cvData, cvTitle, isAr = true }: Props) {
       setIntel(data)
       lastFetchRef.current = new Date().toISOString()
     } catch {
-      setError(isAr ? 'فشل التحليل. حاول مرة أخرى.' : 'Analysis failed. Please try again.')
+      setError(b.intelAnalysisFailed)
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -507,22 +519,20 @@ export function IntelligenceDashboard({ cvData, cvTitle, isAr = true }: Props) {
   // ── Empty state ──────────────────────────────────────────────────
   if (!hasProfile) {
     return (
-      <div className="min-h-screen bg-[#070710] flex items-center justify-center p-8">
-        <div className="text-center max-w-md">
+      <div className="min-h-screen bg-[#070710] flex items-center justify-center p-4 sm:p-8">
+        <div className="text-center max-w-sm sm:max-w-md">
           <div className="w-20 h-20 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-4xl mx-auto mb-6">
             📊
           </div>
           <h2 className="text-2xl font-black mb-3 text-white">
-            {isAr ? 'أكمل سيرتك الذاتية أولاً' : 'Complete Your CV First'}
+            {b.intelCompleteCV}
           </h2>
-          <p className="text-gray-400 text-sm mb-6" dir={isAr ? 'rtl' : 'ltr'}>
-            {isAr
-              ? 'أضف اسمك ومسماك الوظيفي ومهاراتك حتى يتمكن الذكاء الاصطناعي من تحليل ملفك المهني.'
-              : 'Add your job title and skills so the AI can analyze your professional profile.'}
+          <p className="text-gray-400 text-sm mb-6" dir={isRTL ? 'rtl' : 'ltr'}>
+            {b.intelCompleteCVDesc}
           </p>
           <a href="/builder"
             className="inline-flex items-center gap-2 bg-amber-500 text-black font-black px-6 py-3 rounded-xl hover:bg-amber-400 transition-colors">
-            {isAr ? '← أكمل السيرة الذاتية' : 'Complete Your CV →'}
+            {b.intelCompleteCVBtn}
           </a>
         </div>
       </div>
@@ -532,7 +542,7 @@ export function IntelligenceDashboard({ cvData, cvTitle, isAr = true }: Props) {
   // ── Loading state ────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#070710] p-6">
+      <div className="min-h-screen bg-[#070710] p-4 sm:p-6">
         {/* Header skeleton */}
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-4 mb-8">
@@ -544,25 +554,25 @@ export function IntelligenceDashboard({ cvData, cvTitle, isAr = true }: Props) {
           </div>
 
           {/* Analyzing animation */}
-          <div className="bg-white/3 border border-amber-500/15 rounded-2xl p-8 mb-6 text-center">
+          <div className="bg-white/3 border border-amber-500/15 rounded-2xl p-5 sm:p-8 mb-6 text-center">
             <div className="w-16 h-16 mx-auto mb-4 relative">
               <div className="w-full h-full rounded-full border-2 border-amber-500/20 animate-spin"
                 style={{ borderTopColor: '#C9A84C' }} />
               <div className="absolute inset-2 rounded-full border border-amber-500/10 animate-ping" />
             </div>
             <div className="text-amber-400 font-bold text-lg mb-2">
-              {isAr ? 'جاري تحليل ملفك المهني...' : 'Analyzing your professional profile...'}
+              {b.intelAnalyzing}
             </div>
             <div className="text-gray-500 text-sm">
-              {isAr ? 'يستغرق هذا 10-20 ثانية' : 'This takes 10-20 seconds'}
+              {b.intelTakes}
             </div>
             {/* Animated dots */}
             <div className="flex justify-center gap-2 mt-4">
-              {['تحليل السوق', 'معايرة الراتب', 'فجوات المهارات', 'نبض السوق'].map((s, i) => (
+              {[b.intelCareerHealthTab, b.intelSalaryBenchmarks, b.intelSkillsRadar, b.intelMarketPulse].map((s, i) => (
                 <div key={s} className="text-xs text-gray-600 flex items-center gap-1"
                   style={{ animationDelay: `${i * 0.5}s` }}>
                   <div className="w-1 h-1 bg-amber-500/40 rounded-full animate-pulse" />
-                  {isAr ? s : ['Market analysis', 'Salary benchmarks', 'Skill gaps', 'Market pulse'][i]}
+                  {s}
                 </div>
               ))}
             </div>
@@ -582,13 +592,13 @@ export function IntelligenceDashboard({ cvData, cvTitle, isAr = true }: Props) {
   // ── Error state ──────────────────────────────────────────────────
   if (error) {
     return (
-      <div className="min-h-screen bg-[#070710] flex items-center justify-center p-8">
-        <div className="text-center max-w-md">
+      <div className="min-h-screen bg-[#070710] flex items-center justify-center p-4 sm:p-8">
+        <div className="text-center max-w-sm sm:max-w-md">
           <div className="text-5xl mb-4">⚠️</div>
           <p className="text-gray-400 mb-4">{error}</p>
           <button onClick={() => analyze()}
             className="bg-amber-500 text-black font-black px-6 py-3 rounded-xl hover:bg-amber-400">
-            {isAr ? 'حاول مرة أخرى' : 'Try Again'}
+            {b.intelRetry}
           </button>
         </div>
       </div>
@@ -600,11 +610,11 @@ export function IntelligenceDashboard({ cvData, cvTitle, isAr = true }: Props) {
   const name = cvData?.personal?.fullName || cvData?.personal?.fullNameEn || ''
   const title = cvData?.personal?.jobTitle || cvData?.personal?.jobTitleEn || ''
   const generatedTime = intel.generatedAt
-    ? new Date(intel.generatedAt).toLocaleTimeString(isAr ? 'ar' : 'en', { hour: '2-digit', minute: '2-digit' })
+    ? new Date(intel.generatedAt).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
     : ''
 
   return (
-    <div className="min-h-screen bg-[#070710]" dir={isAr ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-[#070710]" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Ambient background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 rounded-full opacity-5"
@@ -613,10 +623,10 @@ export function IntelligenceDashboard({ cvData, cvTitle, isAr = true }: Props) {
           style={{ background: 'radial-gradient(circle, #22C55E 0%, transparent 70%)', transform: 'translate(-30%, 30%)' }} />
       </div>
 
-      <div className="relative max-w-6xl mx-auto p-5 md:p-8 pb-16">
+      <div className="relative max-w-6xl mx-auto p-4 sm:p-5 md:p-8 pb-20 sm:pb-16">
 
         {/* ── Page Header ─────────────────────────────────────── */}
-        <div className="flex items-start justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
           <div>
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center text-xl">
@@ -624,18 +634,18 @@ export function IntelligenceDashboard({ cvData, cvTitle, isAr = true }: Props) {
               </div>
               <div>
                 <div className="text-xs font-mono uppercase tracking-[0.2em] text-gray-600">
-                  {isAr ? 'لوحة الذكاء المهني' : 'Career Intelligence'}
+                  {b.intelTitle}
                 </div>
                 <h1 className="text-xl font-black text-white">
-                  {name || cvTitle || (isAr ? 'ملفي المهني' : 'My Profile')}
+                  {name || cvTitle || (b.intelMyProfile)}
                 </h1>
               </div>
             </div>
             <div className="flex items-center gap-3 text-xs font-mono text-gray-600">
               <span>💼 {title}</span>
-              {generatedTime && <span>· {isAr ? 'تحليل' : 'Analyzed'} {generatedTime}</span>}
+              {generatedTime && <span>· {b.intelAnalyzed} {generatedTime}</span>}
               <span className="flex items-center gap-1">
-                · {isAr ? 'اكتمال الملف' : 'Profile'} <span className="text-amber-400 font-bold">{intel.profileCompleteness}%</span>
+                · {b.intelProfile} <span className="text-amber-400 font-bold">{intel.profileCompleteness}%</span>
               </span>
             </div>
           </div>
@@ -646,17 +656,17 @@ export function IntelligenceDashboard({ cvData, cvTitle, isAr = true }: Props) {
             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 text-gray-400 hover:border-amber-500/30 hover:text-amber-400 transition-all text-sm disabled:opacity-40 flex-shrink-0"
           >
             <span className={refreshing ? 'animate-spin' : ''}>↺</span>
-            {isAr ? 'تحديث' : 'Refresh'}
+            {b.intelRefresh}
           </button>
         </div>
 
         {/* ── Row 1: Health + Salary ───────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
           {/* Health Score */}
-          <div className="bg-[#0D0D1A] border border-white/8 rounded-2xl p-6 hover:border-white/12 transition-all">
+          <div className="bg-[#0D0D1A] border border-white/8 rounded-2xl p-4 sm:p-6 hover:border-white/12 transition-all">
             <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-gray-600 mb-5 flex items-center gap-2">
               <span className="w-1 h-3 rounded-full bg-amber-400 inline-block" />
-              {isAr ? 'الصحة المهنية' : 'Career Health'}
+              {b.intelCareerHealthTab}
             </div>
             <HealthRing
               score={intel.healthScore}
@@ -669,10 +679,10 @@ export function IntelligenceDashboard({ cvData, cvTitle, isAr = true }: Props) {
           </div>
 
           {/* Salary Intelligence */}
-          <div className="bg-[#0D0D1A] border border-white/8 rounded-2xl p-6 hover:border-white/12 transition-all">
+          <div className="bg-[#0D0D1A] border border-white/8 rounded-2xl p-4 sm:p-6 hover:border-white/12 transition-all">
             <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-gray-600 mb-5 flex items-center gap-2">
               <span className="w-1 h-3 rounded-full bg-emerald-400 inline-block" />
-              {isAr ? 'معايير الراتب' : 'Salary Benchmarks'}
+              {b.intelSalaryBenchmarks}
             </div>
             <SalaryPanel data={intel.salaryIntel} isAr={isAr} />
           </div>
@@ -681,29 +691,29 @@ export function IntelligenceDashboard({ cvData, cvTitle, isAr = true }: Props) {
         {/* ── Row 2: Skill Gaps + Market Pulse ────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
           {/* Skill Gaps */}
-          <div className="bg-[#0D0D1A] border border-white/8 rounded-2xl p-6 hover:border-white/12 transition-all">
+          <div className="bg-[#0D0D1A] border border-white/8 rounded-2xl p-4 sm:p-6 hover:border-white/12 transition-all">
             <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-gray-600 mb-5 flex items-center gap-2">
               <span className="w-1 h-3 rounded-full bg-red-400 inline-block" />
-              {isAr ? 'رادار المهارات' : 'Skills Radar'}
+              {b.intelSkillsRadar}
             </div>
             <SkillGapsPanel gaps={intel.skillGaps} strengths={intel.strengths} isAr={isAr} />
           </div>
 
           {/* Market Pulse */}
-          <div className="bg-[#0D0D1A] border border-white/8 rounded-2xl p-6 hover:border-white/12 transition-all">
+          <div className="bg-[#0D0D1A] border border-white/8 rounded-2xl p-4 sm:p-6 hover:border-white/12 transition-all">
             <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-gray-600 mb-5 flex items-center gap-2">
               <span className="w-1 h-3 rounded-full bg-blue-400 inline-block" />
-              {isAr ? 'نبض السوق' : 'Market Pulse'}
+              {b.intelMarketPulse}
             </div>
             <MarketPulsePanel data={intel.marketPulse} isAr={isAr} />
           </div>
         </div>
 
         {/* ── Row 3: Action Plan (full width) ─────────────────── */}
-        <div className="bg-[#0D0D1A] border border-white/8 rounded-2xl p-6 hover:border-white/12 transition-all">
+        <div className="bg-[#0D0D1A] border border-white/8 rounded-2xl p-4 sm:p-6 hover:border-white/12 transition-all">
           <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-gray-600 mb-5 flex items-center gap-2">
             <span className="w-1 h-3 rounded-full bg-purple-400 inline-block" />
-            {isAr ? 'خطة العمل — خطواتك التالية' : 'Action Plan — Your Next Steps'}
+            {b.intelActionPlan}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <ActionPlan items={intel.actionPlan} isAr={isAr} />
@@ -711,26 +721,24 @@ export function IntelligenceDashboard({ cvData, cvTitle, isAr = true }: Props) {
         </div>
 
         {/* ── Footer nav ──────────────────────────────────────── */}
-        <div className="flex flex-wrap gap-3 justify-center mt-8">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 justify-center mt-6 sm:mt-8">
           <a href="/builder"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500/15 border border-amber-500/25 text-amber-300 text-sm font-bold hover:bg-amber-500/25 transition-all">
-            ✎ {isAr ? 'تحسين السيرة الذاتية' : 'Improve CV'}
+            className="flex items-center justify-center gap-2 px-5 py-3 sm:py-2.5 rounded-xl bg-amber-500/15 border border-amber-500/25 text-amber-300 text-sm font-bold hover:bg-amber-500/25 transition-all">
+            ✎ {b.intelImproveCV}
           </a>
           <a href="/tailor"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-bold hover:bg-emerald-500/20 transition-all">
-            🎯 {isAr ? 'خصّص لوظيفة' : 'Tailor for Job'}
+            className="flex items-center justify-center gap-2 px-5 py-3 sm:py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-bold hover:bg-emerald-500/20 transition-all">
+            🎯 {b.intelTailorJob}
           </a>
           <a href="/dashboard"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/10 text-gray-400 text-sm font-bold hover:border-white/20 transition-all">
-            ← {isAr ? 'سيرتي' : 'My CVs'}
+            className="flex items-center justify-center gap-2 px-5 py-3 sm:py-2.5 rounded-xl border border-white/10 text-gray-400 text-sm font-bold hover:border-white/20 transition-all">
+            ← {b.intelMyCVs}
           </a>
         </div>
 
         {/* Disclaimer */}
         <p className="text-center text-[10px] text-gray-700 mt-6 font-mono">
-          {isAr
-            ? '⚠ البيانات تقديرية مبنية على تحليل الذكاء الاصطناعي لسوق العمل — للاسترشاد فقط'
-            : '⚠ Data is AI-estimated based on market analysis — for guidance only'}
+          {b.intelDisclaimer}
         </p>
       </div>
 

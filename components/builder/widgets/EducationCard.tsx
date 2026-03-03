@@ -1,13 +1,15 @@
 'use client'
 // components/builder/widgets/EducationCard.tsx
 import { useState } from 'react'
+import { useT } from '@/lib/i18n/context'
 import { Education } from '@/types/cv'
 import { SmartInput } from './SmartInput'
-import { educationItemSchema, gpaField } from '@/lib/validation/schemas'
+import { educationItemSchema } from '@/lib/validation/schemas'
 import { useValidation } from '@/lib/validation/useValidation'
 
 const DEG_AR = ['بكالوريا','ليسانس','ماستر','دكتوراه','دبلوم','شهادة مهنية']
 const DEG_EN = ["Bachelor's","Master's",'PhD','Diploma','Certificate',"Associate's"]
+const DEG_FR = ['Licence','Master','Doctorat','BTS','DUT','Ingénieur']
 
 interface Props {
   edu: Education; index: number; mode: string; total: number
@@ -18,11 +20,18 @@ interface Props {
 export function EducationCard({ edu, index, mode, total, onUpdate, onRemove }: Props) {
   const [open, setOpen] = useState(index === 0)
   const [del,  setDel]  = useState(false)
-  const isEn = mode === 'en', isBi = mode === 'bilingual'
+  const { t, locale } = useT()
+  const b = t.builder
+
+  // CV content mode — which DB fields to use
+  const isEn = mode === 'en'
+  const isBi = mode === 'bilingual'
+  const cvDir = isEn ? 'ltr' : 'rtl'
 
   const deg  = isEn ? (edu.degreeEn || edu.degree) : edu.degree
   const inst = isEn ? (edu.institutionEn || edu.institution) : edu.institution
-  const degs = isEn ? DEG_EN : DEG_AR
+  // Degree chips: use locale-appropriate labels (these are CV content type labels)
+  const degs = locale === 'ar' ? DEG_AR : locale === 'fr' ? DEG_FR : DEG_EN
   const activeDeg = isEn ? edu.degreeEn : edu.degree
 
   const v = useValidation(educationItemSchema)
@@ -43,7 +52,7 @@ export function EducationCard({ edu, index, mode, total, onUpdate, onRemove }: P
               <div className="text-xs text-gray-500 truncate">{inst}{edu.endDate && ` · ${edu.endDate}`}</div>
             </>
           ) : (
-            <div className="text-sm text-gray-600 italic">{isEn ? 'New education entry' : 'شهادة جديدة — انقر للتعبئة'}</div>
+            <div className="text-sm text-gray-600 italic">{b.emptyEducation}</div>
           )}
         </div>
         <div className={`text-gray-600 text-xs transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>▾</div>
@@ -54,7 +63,7 @@ export function EducationCard({ edu, index, mode, total, onUpdate, onRemove }: P
         <div className="px-4 pb-5 pt-1 space-y-4 border-t border-white/6">
           {/* Degree quick-select */}
           <div>
-            <p className="text-[10px] text-gray-600 uppercase tracking-widest font-bold mb-2">{isEn ? 'Degree type' : 'نوع الشهادة'}</p>
+            <p className="text-[10px] text-gray-600 uppercase tracking-widest font-bold mb-2">{b.degreeType}</p>
             <div className="flex flex-wrap gap-1.5">
               {degs.map(d => (
                 <button key={d} onClick={() => isEn ? onUpdate({ degreeEn: d }) : onUpdate({ degree: d })}
@@ -68,10 +77,8 @@ export function EducationCard({ edu, index, mode, total, onUpdate, onRemove }: P
           {isBi ? (
             <div className="space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <SmartInput label="الشهادة" value={edu.degree || ''} onChange={v => onUpdate({ degree: v })}
-                  dir="rtl" />
-                <SmartInput label="Degree" value={edu.degreeEn || ''} onChange={v => onUpdate({ degreeEn: v })}
-                  dir="ltr" />
+                <SmartInput label="الشهادة" value={edu.degree || ''} onChange={v => onUpdate({ degree: v })} dir="rtl" />
+                <SmartInput label="Degree" value={edu.degreeEn || ''} onChange={v => onUpdate({ degreeEn: v })} dir="ltr" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <SmartInput label="التخصص" value={edu.field || ''} onChange={v => onUpdate({ field: v })} dir="rtl" />
@@ -79,42 +86,40 @@ export function EducationCard({ edu, index, mode, total, onUpdate, onRemove }: P
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <SmartInput label="المؤسسة" value={edu.institution || ''} onChange={v => onUpdate({ institution: v })}
-                  dir="rtl" icon="🎓"
-                  error={fe('institution')} onBlur={touch('institution')} />
+                  dir="rtl" icon="🎓" error={fe('institution')} onBlur={touch('institution')} />
                 <SmartInput label="Institution" value={edu.institutionEn || ''} onChange={v => onUpdate({ institutionEn: v })}
-                  dir="ltr" icon="🎓"
-                  error={fe('institutionEn')} onBlur={touch('institutionEn')} />
+                  dir="ltr" icon="🎓" error={fe('institutionEn')} onBlur={touch('institutionEn')} />
               </div>
             </div>
           ) : (
             <div className="space-y-3">
-              <SmartInput label={isEn ? 'Degree' : 'الشهادة'}
+              <SmartInput label={b.degreeField}
                 value={isEn ? (edu.degreeEn || '') : (edu.degree || '')}
                 onChange={v => isEn ? onUpdate({ degreeEn: v }) : onUpdate({ degree: v })}
-                dir={isEn ? 'ltr' : 'rtl'} />
-              <SmartInput label={isEn ? 'Field of Study' : 'التخصص'}
+                dir={cvDir} />
+              <SmartInput label={b.fieldOfStudy}
                 value={isEn ? (edu.fieldEn || '') : (edu.field || '')}
                 onChange={v => isEn ? onUpdate({ fieldEn: v }) : onUpdate({ field: v })}
-                dir={isEn ? 'ltr' : 'rtl'} />
-              <SmartInput label={isEn ? 'Institution' : 'المؤسسة'}
+                dir={cvDir} />
+              <SmartInput label={b.institutionLabel}
                 value={isEn ? (edu.institutionEn || '') : (edu.institution || '')}
                 onChange={v => isEn ? onUpdate({ institutionEn: v }) : onUpdate({ institution: v })}
-                dir={isEn ? 'ltr' : 'rtl'} icon="🎓"
+                dir={cvDir} icon="🎓"
                 error={fe(isEn ? 'institutionEn' : 'institution')}
                 onBlur={touch(isEn ? 'institutionEn' : 'institution')} />
             </div>
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <SmartInput label={isEn ? 'Graduation Year' : 'سنة التخرج'}
+            <SmartInput label={b.graduationYear}
               value={edu.endDate || ''} onChange={v => onUpdate({ endDate: v })}
               dir="ltr" icon="📅"
-              hint={isEn ? 'e.g. 2020 or 2020-06' : 'مثال: 2020 أو 2020-06'}
+              hint={b.graduationHint}
               error={fe('endDate')} onBlur={touch('endDate')} />
-            <SmartInput label={isEn ? 'GPA / Grade' : 'المعدل'}
+            <SmartInput label={b.gpaLabel}
               value={edu.gpa || ''} onChange={v => onUpdate({ gpa: v })}
               dir="ltr"
-              hint={isEn ? 'e.g. 3.8/4.0' : 'مثال: 3.8/4.0 أو ممتاز'}
+              hint={b.gpaHint}
               error={fe('gpa')} onBlur={touch('gpa')} />
           </div>
 
@@ -122,7 +127,7 @@ export function EducationCard({ edu, index, mode, total, onUpdate, onRemove }: P
             <button
               onClick={() => { if (del) { onRemove() } else { setDel(true); setTimeout(() => setDel(false), 2500) } }}
               className={`text-xs px-3 py-1.5 rounded-lg transition-all ${del ? 'bg-red-500/15 border border-red-500/30 text-red-400 font-bold' : 'text-gray-700 hover:text-red-400 hover:bg-red-500/8'}`}>
-              {del ? (isEn ? '✕ Confirm' : '✕ تأكيد') : (isEn ? 'Remove' : 'حذف')}
+              {del ? b.confirmDelete : b.deleteBtn}
             </button>
           </div>
         </div>

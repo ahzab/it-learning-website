@@ -1,13 +1,13 @@
-// app/api/mobile/auth/register/route.ts
 import { NextRequest } from 'next/server'
-import { ok, err, corsOptions } from '@/lib/mobile-auth'
-import { signMobileToken } from '@/lib/mobile-auth'
+import { ok, err, corsOptions, signMobileToken } from '@/lib/mobile-auth'
 import { registerSchema } from '@/lib/validation/schemas'
 import { authService } from '@/lib/services'
+import { getIP } from '@/lib/observability'
 
 export async function OPTIONS() { return corsOptions() }
 
 export async function POST(req: NextRequest) {
+  const ip = getIP(req)
   let body: unknown
   try { body = await req.json() } catch { return err('Invalid JSON body', 400, 'INVALID_JSON') }
 
@@ -22,9 +22,7 @@ export async function POST(req: NextRequest) {
   }
 
   const result = await authService.registerUser(
-    parsed.data.name,
-    parsed.data.email,
-    parsed.data.password,
+    parsed.data.name, parsed.data.email, parsed.data.password, ip,
   )
 
   if (!result.ok) {

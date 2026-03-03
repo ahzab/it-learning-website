@@ -35,27 +35,27 @@ export function IntelligenceTeaser() {
   ]
 
   return (
-    <section id="intelligence-teaser" className="py-28 px-6 relative overflow-hidden" style={{ background:'#060608' }}>
+    <section id="intelligence-teaser" className="py-16 sm:py-24 px-4 sm:px-6 relative overflow-hidden" style={{ background:'#060608' }}>
       <div className="absolute inset-0 arabesque-bg opacity-20 pointer-events-none" />
       <div className="absolute inset-0 pointer-events-none"
         style={{ background:'radial-gradient(ellipse at 80% 50%, rgba(34,197,94,0.04) 0%, transparent 60%)' }} />
 
-      <div className="relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div className="relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
         {/* Text — left in LTR, right in RTL */}
         <div className={isRTL ? 'lg:order-2' : 'lg:order-1'}>
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border mb-8"
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border mb-5 sm:mb-8"
             style={{ background:'rgba(34,197,94,0.06)', borderColor:'rgba(34,197,94,0.2)', color:'#22C55E' }}>
             {d.badge}
           </div>
-          <h2 className="text-4xl lg:text-5xl font-black leading-[1.05] mb-6 text-[#F0EBE0]">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.05] mb-5 sm:mb-6 text-[#F0EBE0]">
             {d.headline1}
             <br />
             <span style={greenText}>{d.headline2}</span>
           </h2>
-          <p className="text-[#6B6672] text-base leading-relaxed mb-10">{d.subtext}</p>
+          <p className="text-[#6B6672] text-sm sm:text-base leading-relaxed mb-7 sm:mb-10">{d.subtext}</p>
 
-          <div className="space-y-4 mb-10">
+          <div className="space-y-4 mb-7 sm:mb-10">
             {features.map(f => (
               <div key={f.title} className="flex items-start gap-4">
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0 border"

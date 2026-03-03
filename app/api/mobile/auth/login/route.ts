@@ -1,12 +1,13 @@
-// app/api/mobile/auth/login/route.ts
 import { NextRequest } from 'next/server'
 import { ok, err, corsOptions, signMobileToken } from '@/lib/mobile-auth'
 import { loginSchema } from '@/lib/validation/schemas'
 import { authService } from '@/lib/services'
+import { getIP } from '@/lib/observability'
 
 export async function OPTIONS() { return corsOptions() }
 
 export async function POST(req: NextRequest) {
+  const ip = getIP(req)
   let body: unknown
   try { body = await req.json() } catch { return err('Invalid JSON body', 400, 'INVALID_JSON') }
 
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
     return err('Validation failed', 422, 'VALIDATION_ERROR', { fields })
   }
 
-  const result = await authService.loginUser(parsed.data.email, parsed.data.password)
+  const result = await authService.loginUser(parsed.data.email, parsed.data.password, ip)
 
   if (!result.ok) {
     const status = result.code === 'INVALID_CREDENTIALS' ? 401 : 500

@@ -208,3 +208,76 @@ body::before {
     width: var(--panel-w, 440px);
   }
 }
+
+/* ── Mobile-specific improvements ──────────────────────────────────── */
+
+/* Better tap feedback on iOS */
+@media (hover: none) and (pointer: coarse) {
+  button, a {
+    -webkit-tap-highlight-color: rgba(201, 168, 76, 0.1);
+  }
+  /* Slightly larger touch targets for small buttons */
+  .touch-expand {
+    position: relative;
+  }
+  .touch-expand::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+  }
+}
+
+/* Prevent text size adjustment on orientation change (iOS) */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Smooth momentum scrolling on iOS */
+.overflow-y-auto, .overflow-y-scroll {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fix 100vh on mobile browsers with address bar */
+.min-h-screen {
+  min-height: 100svh;
+}
+
+/* Scale-down on press for mobile buttons */
+@media (hover: none) and (pointer: coarse) {
+  .active\:scale-98:active {
+    transform: scale(0.98);
+  }
+  .active\:scale-95:active {
+    transform: scale(0.95);
+  }
+}
+
+/* Hide large decorative animations on small screens for performance */
+@media (max-width: 640px) {
+  .animate-spin-slow {
+    display: none;
+  }
+}
+
+/* Better scrollbar on mobile */
+::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(201, 168, 76, 0.2);
+  border-radius: 99px;
+}
+
+/* Prevent horizontal scroll from overflowing elements */
+body {
+  overflow-x: hidden;
+}
+
+/* Mobile-safe modal/overlay z-index base */
+.z-modal { z-index: 60; }
+.z-toast  { z-index: 70; }
