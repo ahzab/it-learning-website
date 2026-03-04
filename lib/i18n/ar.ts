@@ -1,6 +1,6 @@
 // lib/i18n/ar.ts — Arabic (RTL) — اللغة العربية
 export const ar = {
-  dir: 'rtl' as const,
+  dir: 'rtl' as 'rtl' | 'ltr',
   lang: 'ar',
 
   // ── Navbar ─────────────────────────────────────────────────────────
@@ -203,6 +203,8 @@ export const ar = {
       { label: 'الذكاء المهني',    href: '/intelligence' },
       { label: 'تخصيص لوظيفة',    href: '/tailor' },
       { label: 'خطاب التقديم',    href: '/cover-letter' },
+      { label: 'لوحة الوظائف',    href: '/jobs' },
+      { label: 'الإعدادات',        href: '/account' },
       { label: 'القوالب',          href: '#templates' },
     ],
     marketLinks: [
@@ -350,6 +352,8 @@ export const ar = {
     careerIntel:   '📊 الذكاء المهني',
 
     coverLetterNav:    '✉ خطاب تقديم',
+    jobsNav:          '💼 الوظائف',
+    accountNav:       '⚙ الإعدادات',
     coverLetterBtn:    '✉ كتابة خطاب',
     coverLetterTitle:  'خطاب التقديم',
     coverLetterDesc:   'خطاب احترافي مخصص لكل وظيفة',

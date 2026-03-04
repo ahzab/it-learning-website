@@ -1,12 +1,13 @@
 'use client'
 // components/tailor/TailorClient.tsx
 import { useState, useRef, useEffect } from 'react'
+import { AIErrorModal } from '@/components/ui/AIErrorModal'
 import { useRouter } from 'next/navigation'
 import { useCVStore } from '@/lib/store'
 import { useT } from '@/lib/i18n/context'
 import { CVData } from '@/types/cv'
 
-type Stage = 'input' | 'tailoring' | 'review' | 'error'
+type Stage = 'input' | 'tailoring' | 'review'
 
 interface TailorResult {
   cv: CVData
@@ -177,8 +178,8 @@ export function TailorClient() {
       setResult(data as TailorResult)
       setStage('review')
     } catch (e: any) {
-      setError(e.message || 'حدث خطأ')
-      setStage('error')
+      setError(e.message || 'GENERIC_ERROR')
+      setStage('input')
     }
   }
 
@@ -219,7 +220,16 @@ export function TailorClient() {
 
   // ── INPUT STAGE ───────────────────────────────────────────────────
   if (stage === 'input') return (
-    <div className="min-h-screen bg-[#080810] text-white" dir={isRTL ? 'rtl' : 'ltr'}>
+    <>
+      {error && (
+        <AIErrorModal
+          code={error}
+          message={error}
+          onClose={() => setError('')}
+          onRetry={tailor}
+        />
+      )}
+      <div className="min-h-screen bg-[#080810] text-white" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header */}
       <div className="px-4 sm:px-6 py-3.5 flex items-center justify-between border-b border-white/6">
         <div className="flex items-center gap-3">
@@ -367,6 +377,7 @@ export function TailorClient() {
         </button>
       </div>
     </div>
+    </>
   )
 
   // ── TAILORING STAGE ───────────────────────────────────────────────
@@ -407,18 +418,7 @@ export function TailorClient() {
   )
 
   // ── ERROR STAGE ───────────────────────────────────────────────────
-  if (stage === 'error') return (
-    <div className="min-h-screen bg-[#080810] text-white flex flex-col items-center justify-center px-4">
-      <div className="text-center max-w-sm">
-        <div className="text-5xl mb-4">⚠️</div>
-        <h2 className="text-xl font-bold mb-2">{b.tailorError}</h2>
-        <p className="text-gray-400 text-sm mb-6">{error}</p>
-        <button onClick={() => setStage('input')} className="bg-yellow-500 text-black px-6 py-3 rounded-xl font-bold hover:bg-yellow-400 transition-all">
-          {b.tailorRetry}
-        </button>
-      </div>
-    </div>
-  )
+
 
   // ── REVIEW STAGE ─────────────────────────────────────────────────
   if (stage === 'review' && result) {
@@ -599,7 +599,7 @@ export function TailorClient() {
             {showDiffs && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {result.changes.map((change, i) => (
-                  <ChangeCard key={i} change={change} index={i} />
+                  <span key={i}><ChangeCard change={change} index={i} /></span>
                 ))}
               </div>
             )}

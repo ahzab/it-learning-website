@@ -14,11 +14,12 @@ const TEMPLATE_LABELS: Record<string, { label: string; color: string }> = {
 }
 
 interface CV {
-  id: string
-  title: string
+  id:       string
+  title:    string
   template: string
-  data: unknown
+  data:     unknown
   updatedAt: Date
+  isPublic: boolean
 }
 
 interface CoverLetterSummary {
@@ -62,6 +63,9 @@ export function DashboardContent({ cvs, plan, name, email, coverLetters = [] }: 
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <span className={`text-xs px-2.5 py-1 rounded-full font-bold flex-shrink-0 ${planCls}`}>{planLabel}</span>
           <span className="text-gray-400 text-sm truncate hidden sm:block">{name || email}</span>
+          <Link href="/account" className="text-xs text-gray-500 hover:text-gray-300 border border-white/8 px-2.5 py-1 rounded-lg transition-colors flex-shrink-0" title={isRTL ? 'إعدادات الحساب' : 'Account settings'}>
+            ⚙
+          </Link>
         </div>
       </div>
 
@@ -99,6 +103,10 @@ export function DashboardContent({ cvs, plan, name, email, coverLetters = [] }: 
             <Link href="/cover-letter"
               className="flex items-center justify-center gap-1.5 border border-amber-500/25 text-amber-400 px-4 py-2.5 rounded-xl font-bold hover:bg-amber-500/10 transition-all text-sm">
               {b.coverLetterBtn ?? '✉ Cover Letter'}
+            </Link>
+            <Link href="/jobs"
+              className="flex items-center justify-center gap-1.5 border border-cyan-500/25 text-cyan-400 px-4 py-2.5 rounded-xl font-bold hover:bg-cyan-500/10 transition-all text-sm">
+              {(b as any).jobsNav ?? '💼 Jobs'}
             </Link>
           </div>
         </div>
@@ -166,6 +174,11 @@ export function DashboardContent({ cvs, plan, name, email, coverLetters = [] }: 
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs px-2 py-0.5 rounded-md bg-white/5" style={{ color: tpl.color }}>{tpl.label}</span>
                     <span className="text-xs px-2 py-0.5 rounded-md bg-white/5 text-gray-500">{modeLabel}</span>
+                    {cv.isPublic && (
+                      <span className="text-xs px-2 py-0.5 rounded-md bg-teal-500/10 text-teal-400 border border-teal-500/20">
+                        🔗 {isRTL ? 'مشارك' : 'Public'}
+                      </span>
+                    )}
                     <span className="text-xs text-gray-700 ms-auto">
                       {new Date(cv.updatedAt).toLocaleDateString(locale, { day: 'numeric', month: 'short' })}
                     </span>
@@ -187,7 +200,7 @@ export function DashboardContent({ cvs, plan, name, email, coverLetters = [] }: 
                       className="px-3 py-2.5 rounded-lg text-sm bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/15 transition-colors" title={b.coverLetterTitle ?? 'Cover Letter'}>
                       ✉
                     </a>
-                    <CVCardActions cvId={cv.id} cvTitle={cv.title} />
+                    <CVCardActions cvId={cv.id} cvTitle={cv.title} isPublic={cv.isPublic} />
                   </div>
                 </div>
               )

@@ -4,8 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ─────────────────────────────────────
@@ -26,17 +27,18 @@ model User {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
-  accounts Account[]
-  sessions Session[]
+  accounts     Account[]
+  sessions     Session[]
   cvs          CV[]
   payments     Payment[]
   coverLetters CoverLetter[]
+  jobSaves     JobSave[]
 }
 
 enum Plan {
-  FREE      // 3 AI credits, 1 CV, 2 templates, watermarked PDF
-  STARTER   // $4.99 one-time — 20 AI credits, 3 CVs, all templates, clean PDF
-  PRO       // $12/month — unlimited AI, unlimited CVs, Career Intelligence
+  FREE // 3 AI credits, 1 CV, 2 templates, watermarked PDF
+  STARTER // $4.99 one-time — 20 AI credits, 3 CVs, all templates, clean PDF
+  PRO // $12/month — unlimited AI, unlimited CVs, Career Intelligence
 }
 
 // ─────────────────────────────────────
@@ -55,7 +57,8 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([provider, providerAccountId])
 }
 
@@ -64,13 +67,14 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
   identifier String
   token      String   @unique
   expires    DateTime
+
   @@unique([identifier, token])
 }
 
@@ -83,9 +87,9 @@ model CV {
   title     String   @default("سيرتي الذاتية")
   language  Language @default(AR)
   template  String   @default("classic")
-  country   String   @default("MA")  // MA, AE, SA, EG, QA...
+  country   String   @default("MA") // MA, AE, SA, EG, QA...
   isPublic  Boolean  @default(false)
-  data      Json     // All CV content stored as JSON
+  data      Json // All CV content stored as JSON
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -105,7 +109,7 @@ model Payment {
   id              String        @id @default(cuid())
   userId          String
   stripePaymentId String        @unique
-  amount          Int           // in cents
+  amount          Int // in cents
   currency        String        @default("usd")
   status          PaymentStatus @default(PENDING)
   plan            Plan
@@ -119,6 +123,27 @@ enum PaymentStatus {
   SUCCEEDED
   FAILED
   REFUNDED
+}
+
+// ─────────────────────────────────────
+// JOB BOARD
+// ─────────────────────────────────────
+model JobSave {
+  id      String   @id @default(cuid())
+  userId  String
+  jobId   String // deterministic ID from fetcher
+  source  String
+  title   String
+  company String
+  country String
+  jobData String   @db.Text // full JobPosting JSON
+  savedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, jobId])
+  @@index([userId])
+  @@index([savedAt])
 }
 
 // ─────────────────────────────────────
@@ -146,13 +171,13 @@ model CoverLetter {
 // ─────────────────────────────────────
 model AuditLog {
   id         String   @id @default(cuid())
-  event      String   // EventName from observability/index.ts
+  event      String // EventName from observability/index.ts
   userId     String?
   plan       String?
   ip         String?
-  severity   String   @default("info")   // info | warn | critical
+  severity   String   @default("info") // info | warn | critical
   durationMs Int?
-  meta       String?  @db.Text           // JSON blob of extra data
+  meta       String?  @db.Text // JSON blob of extra data
   createdAt  DateTime @default(now())
 
   @@index([event])

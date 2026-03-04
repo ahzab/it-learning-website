@@ -1,13 +1,14 @@
 'use client'
 // components/generate/GenerateClient.tsx
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { AIErrorModal } from '@/components/ui/AIErrorModal'
 import { useRouter } from 'next/navigation'
 import { useCVStore } from '@/lib/store'
 import { useT } from '@/lib/i18n/context'
 import { CVData } from '@/types/cv'
 
 // ── Types ──────────────────────────────────────────────────────────────
-type Stage = 'input' | 'generating' | 'preview' | 'error'
+type Stage = 'input' | 'generating' | 'preview'
 
 const TEMPLATE_OPTIONS = [
   { id: 'golden',     label: 'ذهبي',          labelEn: 'Golden',     color: '#C9A84C', desc: 'كلاسيكي فاخر',    descEn: 'Classic luxury' },
@@ -169,8 +170,8 @@ export function GenerateClient() {
       setSelectedTemplate(cv.template || 'golden')
       setStage('preview')
     } catch (e: any) {
-      setError(e.message || 'حدث خطأ، حاول مرة أخرى')
-      setStage('error')
+      setError(e.message || 'GENERIC_ERROR')
+      setStage('input')  // stay on input stage, modal overlays it
     }
   }
 
@@ -187,6 +188,14 @@ export function GenerateClient() {
   // ── STAGE: INPUT ─────────────────────────────────────────────────────
   if (stage === 'input') return (
     <div className="min-h-screen bg-[#080810] text-white flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
+      {error && (
+        <AIErrorModal
+          code={error}
+          message={error}
+          onClose={() => setError('')}
+          onRetry={generate}
+        />
+      )}
       {/* Header */}
       <div className="px-4 sm:px-6 py-3.5 flex items-center justify-between border-b border-white/6">
         <a href="/" className="text-yellow-500 font-black text-xl">سيرتي.ai</a>
@@ -315,20 +324,6 @@ export function GenerateClient() {
             style={{ width: `${((generatingStep + 1) / STEPS_AR.length) * 100}%` }}
           />
         </div>
-      </div>
-    </div>
-  )
-
-  // ── STAGE: ERROR ─────────────────────────────────────────────────────
-  if (stage === 'error') return (
-    <div className="min-h-screen bg-[#080810] text-white flex flex-col items-center justify-center px-4">
-      <div className="text-center max-w-sm">
-        <div className="text-5xl mb-4">⚠️</div>
-        <h2 className="text-xl font-bold mb-2">{b.genError}</h2>
-        <p className="text-gray-400 text-sm mb-6">{error}</p>
-        <button onClick={() => setStage('input')} className="bg-yellow-500 text-black px-6 py-3 rounded-xl font-bold hover:bg-yellow-400 transition-all">
-          {b.genRetry}
-        </button>
       </div>
     </div>
   )
@@ -505,9 +500,7 @@ export function GenerateClient() {
             </button>
           </div>
         </div>
-      </div>
-    )
+    </div>
+  )
   }
-
-  return null
 }

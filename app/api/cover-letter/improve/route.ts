@@ -1,4 +1,3 @@
-export const runtime = 'edge'
 import { getServerSession }          from 'next-auth'
 import { authOptions }               from '@/lib/auth'
 import { checkAIAccess, guardError } from '@/lib/ai/guard'

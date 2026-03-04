@@ -57,3 +57,21 @@ CREATE TABLE IF NOT EXISTS "CoverLetter" (
 
 CREATE INDEX IF NOT EXISTS "CoverLetter_userId_idx"   ON "CoverLetter"("userId");
 CREATE INDEX IF NOT EXISTS "CoverLetter_createdAt_idx" ON "CoverLetter"("createdAt");
+
+-- Job saves table
+CREATE TABLE IF NOT EXISTS "JobSave" (
+  "id"      TEXT      NOT NULL PRIMARY KEY,
+  "userId"  TEXT      NOT NULL,
+  "jobId"   TEXT      NOT NULL,
+  "source"  TEXT      NOT NULL,
+  "title"   TEXT      NOT NULL DEFAULT '',
+  "company" TEXT      NOT NULL DEFAULT '',
+  "country" TEXT      NOT NULL DEFAULT '',
+  "jobData" TEXT      NOT NULL,
+  "savedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+  FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE,
+  UNIQUE ("userId", "jobId")
+);
+
+CREATE INDEX IF NOT EXISTS "JobSave_userId_idx" ON "JobSave"("userId");
+CREATE INDEX IF NOT EXISTS "JobSave_savedAt_idx" ON "JobSave"("savedAt");

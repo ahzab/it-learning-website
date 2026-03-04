@@ -2,7 +2,7 @@
 import type { Translations } from './ar'
 
 export const fr: Translations = {
-  dir: 'ltr',
+  dir: 'ltr' as 'rtl' | 'ltr',
   lang: 'fr',
 
   nav: {
@@ -197,6 +197,8 @@ export const fr: Translations = {
       { label: 'Intelligence carrière',  href: '/intelligence' },
       { label: 'Personnaliser par offre', href: '/tailor' },
       { label: 'Lettre de motivation', href: '/cover-letter' },
+      { label: "Offres d'emploi",   href: '/jobs' },
+      { label: 'Paramètres',          href: '/account' },
       { label: 'Modèles',                href: '#templates' },
     ],
     marketLinks: [
@@ -341,6 +343,8 @@ export const fr: Translations = {
     careerIntel:   '📊 Intelligence carrière',
 
     coverLetterNav:    '✉ Lettre de motivation',
+    jobsNav:          '💼 Emplois',
+    accountNav:       '⚙ Paramètres',
     coverLetterBtn:    '✉ Écrire une lettre',
     coverLetterTitle:  'Lettre de motivation',
     coverLetterDesc:   'Une lettre professionnelle adaptée à chaque offre',

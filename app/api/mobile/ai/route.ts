@@ -1,4 +1,3 @@
-export const runtime = 'edge'
 import { NextRequest } from 'next/server'
 import { getMobileUser, ok, err, unauthorized, corsOptions } from '@/lib/mobile-auth'
 import { aiRequestSchema } from '@/lib/validation/schemas'

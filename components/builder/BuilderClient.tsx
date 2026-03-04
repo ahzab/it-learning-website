@@ -56,7 +56,8 @@ const PREVIEW_SIZES = [
 
 export function BuilderClient({ initialTemplate, cvId: initialCvId }: BuilderProps) {
   const { t, isRTL } = useT()
-  const b = t.builder  // shorthand
+  // Guard: t.builder can be undefined during SSR/hydration or with a broken locale file
+  const b = t.builder
 
   const { activeSection, setActiveSection, cv, updateTemplate } = useCVStore()
   const [mobileTab,      setMobileTab]      = useState<MobileTab>('form')
@@ -74,16 +75,16 @@ export function BuilderClient({ initialTemplate, cvId: initialCvId }: BuilderPro
   }, [initialTemplate, updateTemplate])
 
   const SECTIONS = [
-    { id: 'personal',   label: b.sectionPersonal,   icon: '👤' },
-    { id: 'experience', label: b.sectionExperience,  icon: '💼' },
-    { id: 'education',  label: b.sectionEducation,   icon: '🎓' },
-    { id: 'skills',     label: b.sectionSkills,      icon: '⚡' },
+    { id: 'personal',   label: b?.sectionPersonal   ?? 'Personal',   icon: '👤' },
+    { id: 'experience', label: b?.sectionExperience  ?? 'Experience',  icon: '💼' },
+    { id: 'education',  label: b?.sectionEducation   ?? 'Education',   icon: '🎓' },
+    { id: 'skills',     label: b?.sectionSkills      ?? 'Skills',      icon: '⚡' },
   ]
 
   const modeBadge =
-    isBilingual     ? { text: b.modeBilingual, cls: 'border-yellow-500/40 text-yellow-400 bg-yellow-500/10' } :
-    cvMode === 'en' ? { text: b.modeEn,        cls: 'border-blue-500/40 text-blue-400 bg-blue-500/10' }      :
-                      { text: b.modeAr,        cls: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10' }
+    isBilingual     ? { text: b?.modeBilingual ?? 'Bilingual', cls: 'border-yellow-500/40 text-yellow-400 bg-yellow-500/10' } :
+    cvMode === 'en' ? { text: b?.modeEn ?? 'EN',               cls: 'border-blue-500/40 text-blue-400 bg-blue-500/10' }      :
+                      { text: b?.modeAr ?? 'AR',               cls: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10' }
 
   // Desktop resize panels
   const previewPanel = usePanelResize({
@@ -102,10 +103,10 @@ export function BuilderClient({ initialTemplate, cvId: initialCvId }: BuilderPro
     'bg-yellow-500/15 border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/25'
 
   const saveBtnLabel =
-    saveStatus === 'saving' ? b.savingBtn :
-    saveStatus === 'saved'  ? b.savedBtn  :
-    saveStatus === 'error'  ? b.retryBtn  :
-    b.saveBtn
+    saveStatus === 'saving' ? (b?.savingBtn ?? 'Saving…') :
+    saveStatus === 'saved'  ? (b?.savedBtn  ?? 'Saved')   :
+    saveStatus === 'error'  ? (b?.retryBtn  ?? 'Retry')   :
+    (b?.saveBtn ?? 'Save')
 
   const saveIcon =
     saveStatus === 'saving' ? <span className="animate-spin inline-block">⟳</span> :
@@ -154,8 +155,8 @@ export function BuilderClient({ initialTemplate, cvId: initialCvId }: BuilderPro
         {/* Center: mobile tab switcher */}
         <div className="flex items-center gap-1 md:hidden">
           {([
-            { tab: 'form'    as MobileTab, label: b.tabEdit,   icon: '📝' },
-            { tab: 'preview' as MobileTab, label: b.tabPreview, icon: '👁'  },
+            { tab: 'form'    as MobileTab, label: b?.tabEdit ?? 'Edit',   icon: '📝' },
+            { tab: 'preview' as MobileTab, label: b?.tabPreview ?? 'Preview', icon: '👁'  },
             { tab: 'ai'      as MobileTab, label: 'AI',         icon: '✦'  },
           ]).map(({ tab, label, icon }) => (
             <button
@@ -189,7 +190,7 @@ export function BuilderClient({ initialTemplate, cvId: initialCvId }: BuilderPro
               saveStatus === 'error'  ? 'border-red-500/30 text-red-400 bg-red-500/10' :
               'border-white/10 text-gray-400 active:bg-white/10',
             ].join(' ')}
-            aria-label={b.save}
+            aria-label={b?.save ?? 'Save'}
           >
             {saveStatus === 'saving' ? <span className="animate-spin text-xs">⟳</span> :
              saveStatus === 'saved'  ? <span>✓</span> :
@@ -235,8 +236,8 @@ export function BuilderClient({ initialTemplate, cvId: initialCvId }: BuilderPro
             {isBilingual && (
               <div className="px-4 mt-2">
                 <div className="bg-yellow-500/5 border border-yellow-500/15 rounded-xl p-3">
-                  <p className="text-xs text-yellow-400 font-bold mb-1">{b.bilingualTitle}</p>
-                  <p className="text-xs text-gray-600 leading-relaxed">{b.bilingualHint}</p>
+                  <p className="text-xs text-yellow-400 font-bold mb-1">{b?.bilingualTitle ?? 'Bilingual Mode'}</p>
+                  <p className="text-xs text-gray-600 leading-relaxed">{b?.bilingualHint ?? ''}</p>
                 </div>
               </div>
             )}
@@ -256,15 +257,15 @@ export function BuilderClient({ initialTemplate, cvId: initialCvId }: BuilderPro
 
               {lastSaved && saveStatus === 'idle' && (
                 <p className="text-xs text-gray-700 text-center">
-                  {b.savedAt} {lastSaved.toLocaleTimeString(isRTL ? 'ar-MA' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
+                  {b?.savedAt ?? 'Saved at'} {lastSaved.toLocaleTimeString(isRTL ? 'ar-MA' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
                 </p>
               )}
 
               {[
-                { href: '/intelligence', cls: 'text-purple-500/70 hover:text-purple-400 hover:bg-purple-500/5 border-purple-500/10 hover:border-purple-500/20', label: b.navIntelligence },
-                { href: '/tailor',       cls: 'text-emerald-500/70 hover:text-emerald-400 hover:bg-emerald-500/5 border-emerald-500/10 hover:border-emerald-500/20', label: b.navTailor },
-                { href: '/generate',     cls: 'text-yellow-500/70 hover:text-yellow-400 hover:bg-yellow-500/5 border-yellow-500/10 hover:border-yellow-500/20', label: b.navGenerate },
-                { href: '/dashboard',    cls: 'text-gray-600 hover:text-gray-300 hover:bg-white/5 border-white/6', label: b.navMyCVs },
+                { href: '/intelligence', cls: 'text-purple-500/70 hover:text-purple-400 hover:bg-purple-500/5 border-purple-500/10 hover:border-purple-500/20', label: b?.navIntelligence ?? 'Intelligence' },
+                { href: '/tailor',       cls: 'text-emerald-500/70 hover:text-emerald-400 hover:bg-emerald-500/5 border-emerald-500/10 hover:border-emerald-500/20', label: b?.navTailor ?? 'Tailor' },
+                { href: '/generate',     cls: 'text-yellow-500/70 hover:text-yellow-400 hover:bg-yellow-500/5 border-yellow-500/10 hover:border-yellow-500/20', label: b?.navGenerate ?? 'Generate' },
+                { href: '/dashboard',    cls: 'text-gray-600 hover:text-gray-300 hover:bg-white/5 border-white/6', label: b?.navMyCVs ?? 'My CVs' },
               ].map(({ href, cls, label }) => (
                 <a key={href} href={href}
                   className={`w-full py-2 rounded-lg text-xs transition-colors flex items-center justify-center gap-1.5 border ${cls}`}>
@@ -431,7 +432,7 @@ export function BuilderClient({ initialTemplate, cvId: initialCvId }: BuilderPro
             <span className="text-[10px] font-semibold leading-tight">
               {saveStatus === 'saving' ? '…' :
                saveStatus === 'saved'  ? b.saved :
-               b.save}
+               b?.save ?? 'Save'}
             </span>
           </button>
         </div>

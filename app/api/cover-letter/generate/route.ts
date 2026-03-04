@@ -1,4 +1,3 @@
-export const runtime = 'edge'
 import { getServerSession }          from 'next-auth'
 import { authOptions }               from '@/lib/auth'
 import { checkAIAccess, guardError } from '@/lib/ai/guard'
@@ -16,7 +15,7 @@ export async function POST(req: Request) {
 
   const body = await req.json().catch(() => null)
   if (!body) return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400 })
-
+  console.log(session.user);
   const guard = await checkAIAccess(
     session.user.id, (session.user as any).plan ?? 'FREE',
     'generate_cover_letter' as any, ip,

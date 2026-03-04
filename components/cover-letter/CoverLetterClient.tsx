@@ -4,10 +4,12 @@
 // Aesthetic: premium editorial — dark parchment, letterpress typography,
 // gold editorial accents, deliberate whitespace.
 
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useT } from '@/lib/i18n/context'
 import { useCVStore } from '@/lib/store'
+import { AIErrorModal } from '@/components/ui/AIErrorModal'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -82,6 +84,17 @@ export function CoverLetterClient() {
   const { copied, copy }                = useCopy()
 
   const isAr = isRTL || locale === 'ar'
+  const searchParams = useSearchParams()
+
+  // Pre-fill from job board "Apply with cover letter" links
+  useEffect(() => {
+    const jt = searchParams.get('jobTitle')
+    const co = searchParams.get('company')
+    const jd = searchParams.get('jobDesc')
+    if (jt) setJobTitle(jt)
+    if (co) setCompany(co)
+    if (jd) setJobDesc(jd)
+  }, [searchParams])
 
   // Populate form lang from UI locale
   useEffect(() => {
@@ -144,7 +157,7 @@ export function CoverLetterClient() {
 
       const data = await res.json()
       if (!res.ok) {
-        if (res.status === 402) throw new Error('NO_CREDITS')
+        if (res.status === 402) throw new Error('AI_CREDITS_EXHAUSTED')
         if (res.status === 403) throw new Error('PLAN_REQUIRED')
         throw new Error(data.error || 'Generation failed')
       }
@@ -155,8 +168,8 @@ export function CoverLetterClient() {
       setActiveTab(lang === 'en' ? 'en' : 'ar')
       setStage('editing')
     } catch (e: any) {
-      setError(e.message)
-      setStage('error')
+      setError(e.message || 'GENERIC_ERROR')
+      setStage('setup')  // stay on setup, modal overlays
     }
   }
 
@@ -218,7 +231,16 @@ export function CoverLetterClient() {
   // ── STAGE: SETUP ─────────────────────────────────────────────────────────────
 
   if (stage === 'setup') return (
-    <div className="min-h-screen bg-[#06060A] text-white" dir={dir}>
+    <>
+      {error && (
+        <AIErrorModal
+          code={error}
+          message={error}
+          onClose={() => setError('')}
+          onRetry={generate}
+        />
+      )}
+      <div className="min-h-screen bg-[#06060A] text-white" dir={dir}>
 
       {/* Header */}
       <header className="border-b border-white/6 px-4 sm:px-6 py-3.5 flex items-center justify-between">
@@ -396,6 +418,7 @@ export function CoverLetterClient() {
         </div>
       </div>
     </div>
+    </>
   )
 
   // ── STAGE: GENERATING ─────────────────────────────────────────────────────────
@@ -436,49 +459,6 @@ export function CoverLetterClient() {
     )
   }
 
-  // ── STAGE: ERROR ──────────────────────────────────────────────────────────────
-
-  if (stage === 'error') return (
-    <div className="min-h-screen bg-[#06060A] text-white flex items-center justify-center px-4" dir={dir}>
-      <div className="text-center max-w-sm">
-        {error === 'NO_CREDITS' ? (
-          <>
-            <div className="text-5xl mb-4">🔋</div>
-            <h2 className="text-xl font-black mb-2">{isAr ? 'نفدت الأرصدة' : 'No AI credits left'}</h2>
-            <p className="text-gray-400 text-sm mb-6">
-              {isAr ? 'قم بالترقية للحصول على المزيد من أرصدة الذكاء الاصطناعي' : 'Upgrade your plan to get more AI credits'}
-            </p>
-            <div className="flex gap-3 justify-center">
-              <a href="/api/payment/checkout?plan=STARTER" className="bg-yellow-500 text-black px-6 py-3 rounded-xl font-bold hover:bg-yellow-400 transition-all">
-                {isAr ? 'ترقية بـ$4.99' : 'Upgrade — $4.99'}
-              </a>
-            </div>
-          </>
-        ) : error === 'PLAN_REQUIRED' ? (
-          <>
-            <div className="text-5xl mb-4">🔒</div>
-            <h2 className="text-xl font-black mb-2">{isAr ? 'هذه الميزة للمشتركين' : 'Upgrade required'}</h2>
-            <p className="text-gray-400 text-sm mb-6">
-              {isAr ? 'خطاب التقديم متاح في خطة Starter وما فوق' : 'Cover letters require Starter plan or above'}
-            </p>
-            <a href="/api/payment/checkout?plan=STARTER" className="bg-yellow-500 text-black px-6 py-3 rounded-xl font-bold hover:bg-yellow-400 transition-all inline-block">
-              {isAr ? 'ترقية بـ$4.99' : 'Get Starter — $4.99'}
-            </a>
-          </>
-        ) : (
-          <>
-            <div className="text-5xl mb-4">⚠️</div>
-            <h2 className="text-xl font-black mb-2">{isAr ? 'حدث خطأ' : 'Something went wrong'}</h2>
-            <p className="text-gray-400 text-sm mb-6">{error}</p>
-          </>
-        )}
-        <button onClick={() => setStage('setup')} className="mt-3 text-sm text-gray-400 hover:text-white border border-white/10 px-5 py-2.5 rounded-xl transition-colors">
-          {isAr ? '← العودة' : '← Go back'}
-        </button>
-      </div>
-    </div>
-  )
-
   // ── STAGE: EDITING ────────────────────────────────────────────────────────────
 
   if (stage === 'editing' && result) {
@@ -488,6 +468,16 @@ export function CoverLetterClient() {
 
     return (
       <div className="min-h-screen bg-[#06060A] text-white flex flex-col" dir={dir}>
+
+        {/* AI error modal for improve/save errors */}
+        {error && (
+          <AIErrorModal
+            code={error}
+            message={error}
+            onClose={() => setError('')}
+            onRetry={error === 'AI_CREDITS_EXHAUSTED' || error === 'PLAN_REQUIRED' ? undefined : undefined}
+          />
+        )}
 
         {/* Sticky header */}
         <header className="sticky top-0 z-40 bg-[#06060A]/95 backdrop-blur border-b border-white/6 px-4 sm:px-6 py-3 flex items-center gap-3">

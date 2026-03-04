@@ -2,7 +2,7 @@
 import type { Translations } from './ar'
 
 export const en: Translations = {
-  dir: 'ltr',
+  dir: 'ltr' as 'rtl' | 'ltr',
   lang: 'en',
 
   nav: {
@@ -197,6 +197,8 @@ export const en: Translations = {
       { label: 'Career Intelligence', href: '/intelligence' },
       { label: 'Job tailoring',      href: '/tailor' },
       { label: 'Cover Letter',       href: '/cover-letter' },
+      { label: 'Job Board',          href: '/jobs' },
+      { label: 'Account Settings',   href: '/account' },
       { label: 'Templates',          href: '#templates' },
     ],
     marketLinks: [
@@ -340,6 +342,8 @@ export const en: Translations = {
     careerIntel:   '📊 Career Intel',
 
     coverLetterNav:    '✉ Cover Letter',
+    jobsNav:          '💼 Jobs',
+    accountNav:       '⚙ Settings',
     coverLetterBtn:    '✉ Write Cover Letter',
     coverLetterTitle:  'Cover Letter',
     coverLetterDesc:   'A professional letter tailored to each job',

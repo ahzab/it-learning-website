@@ -13,6 +13,8 @@ export default async function DashboardPage() {
     prisma.cV.findMany({
       where:   { userId: session.user.id },
       orderBy: { updatedAt: 'desc' },
+      select:  { id: true, title: true, template: true, language: true,
+                 data: true, updatedAt: true, isPublic: true },
     }),
     prisma.user.findUnique({
       where:  { id: session.user.id },

@@ -7,3 +7,6 @@ export * as cvService      from './cv.service'
 export * as aiService      from './ai.service'
 export * as paymentService    from './payment.service'
 export * as coverLetterService from './cover-letter.service'
+
+export * as jobBoardService from './job-boards/fetcher'
+export * as jobMatchService  from './job-boards/matcher'
